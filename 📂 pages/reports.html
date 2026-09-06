@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reports - MediStock Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f0f4f8;
+            overflow-x: hidden;
+            color: #0a2647;
+        }
+
+        /* ===== Sidebar ===== */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 280px;
+            background: linear-gradient(180deg, #0a2647 0%, #1a4a7a 100%);
+            padding: 28px 20px;
+            overflow-y: auto;
+            z-index: 100;
+            transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+            box-shadow: 4px 0 30px rgba(10, 38, 71, 0.15);
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 28px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 28px;
+        }
+
+        .sidebar-brand .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #fff;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-brand h1 {
+            color: #fff;
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .sidebar-brand span {
+            color: #2d9cdb;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: block;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar-nav .nav-label {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            padding: 14px 14px 8px;
+        }
+
+        .sidebar-nav li a {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: rgba(255, 255, 255, 0.65);
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 500;
+            transition: all 0.25s ease;
+        }
+
+        .sidebar-nav li a i {
+            width: 20px;
+            font-size: 1rem;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .sidebar-nav li a:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .sidebar-nav li a.active {
+            color: #fff;
+            background: rgba(45, 156, 219, 0.2);
+            box-shadow: inset 3px 0 0 #2d9cdb;
+            font-weight: 600;
+        }
+
+        .sidebar-nav li a .badge {
+            margin-left: auto;
+            background: rgba(231, 76, 60, 0.25);
+            color: #ef4444;
+            padding: 2px 10px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        /* ===== Main Content ===== */
+        .main-content {
+            margin-left: 280px;
+            padding: 28px 32px 40px;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* ===== Top Bar ===== */
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 24px;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .topbar-left h2 {
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: #0a2647;
+            letter-spacing: -0.5px;
+        }
+
+        .topbar-left p {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-top: 2px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .topbar-right .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #fff;
+            padding: 6px 14px 6px 8px;
+            border-radius: 50px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+        }
+
+        .topbar-right .user-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0a2647, #2d9cdb);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        .btn-action-outline {
+            padding: 10px 18px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 14px;
+            background: #fff;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-action-outline:hover {
+            border-color: #0a2647;
+            color: #0a2647;
+            background: #f8fafc;
+        }
+
+        /* ===== Stats Cards ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card-mini {
+            background: #fff;
+            border-radius: 16px;
+            padding: 18px 22px;
+            border: 1px solid rgba(10, 38, 71, 0.04);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .stat-card-mini .icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .stat-card-mini .icon.blue {
+            background: rgba(45, 156, 219, 0.1);
+            color: #2d9cdb;
+        }
+        .stat-card-mini .icon.green {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+        }
+        .stat-card-mini .icon.orange {
+            background: rgba(243, 156, 18, 0.1);
+            color: #f39c12;
+        }
+        .stat-card-mini .icon.red {
+            background: rgba(231, 76, 60, 0.08);
+            color: #e74c3c;
+        }
+        .stat-card-mini .icon.purple {
+            background: rgba(155, 89, 182, 0.1);
+            color: #8e44ad;
+        }
+        .stat-card-mini .icon.teal {
+            background: rgba(26, 188, 156, 0.1);
+            color: #1abc9c;
+        }
+
+        .stat-card-mini .info .number {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #0a2647;
+            line-height: 1.2;
+        }
+        .stat-card-mini .info .label {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        /* ===== Chart Cards ===== */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+            margin-bottom: 28px;
+        }
+
+        .chart-card {
+            background: #fff;
+            border-radius: 20px;
+            border: 1px solid rgba(10, 38, 71, 0.04);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+            padding: 24px 24px 20px;
+            transition: all 0.3s ease;
+        }
+
+        .chart-card:hover {
+            box-shadow: 0 8px 30px rgba(10, 38, 71, 0.06);
+        }
+
+        .chart-card .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .chart-card .card-header h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #0a2647;
+        }
+
+        .chart-card .card-header .badge-count {
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 4px 14px;
+            border-radius: 50px;
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .chart-card .chart-container {
+            position: relative;
+            height: 220px;
+        }
+
+        .chart-card .chart-container.pie-chart {
+            height: 220px;
+            max-width: 280px;
+            margin: 0 auto;
+        }
+
+        /* ===== Category List ===== */
+        .category-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .category-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            background: #f8fafc;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .category-item:hover {
+            background: #f1f5f9;
+        }
+
+        .category-item .color-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .category-item .cat-name {
+            flex: 1;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #0a2647;
+        }
+
+        .category-item .cat-count {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #0a2647;
+        }
+
+        .category-item .cat-bar {
+            width: 60px;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 50px;
+            overflow: hidden;
+        }
+
+        .category-item .cat-bar .fill {
+            height: 100%;
+            border-radius: 50px;
+            transition: width 0.6s ease;
+        }
+
+        /* ===== Toast ===== */
+        .toast-notification {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #0a2647;
+            color: #fff;
+            padding: 14px 24px;
+            border-radius: 14px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: 0 8px 30px rgba(10, 38, 71, 0.2);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 0.4s ease;
+            max-width: 400px;
+        }
+
+        .toast-notification .close-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            font-size: 1.2rem;
+            margin-left: 8px;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* ===== Mobile Toggle ===== */
+        .sidebar-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #0a2647;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 38, 71, 0.3);
+            backdrop-filter: blur(4px);
+            z-index: 99;
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .sidebar-overlay.open {
+                display: block;
+            }
+            .sidebar-toggle {
+                display: inline-flex;
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 16px;
+            }
+            .topbar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 14px;
+            }
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 12px;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .chart-card .chart-container {
+                height: 180px;
+            }
+            .chart-card .chart-container.pie-chart {
+                height: 180px;
+                max-width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================================ -->
+    <!-- SIDEBAR OVERLAY -->
+    <!-- ============================================================ -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- ============================================================ -->
+    <!-- SIDEBAR -->
+    <!-- ============================================================ -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="logo-icon"><i class="fas fa-capsules"></i></div>
+            <div>
+                <h1>MediStock</h1>
+                <span>Pro System</span>
+            </div>
+        </div>
+
+        <ul class="sidebar-nav">
+            <li class="nav-label">Main Menu</li>
+            <li>
+                <a href="dashboard.html"><i class="fas fa-th-large"></i> Dashboard</a>
+            </li>
+            <li>
+                <a href="medicines.html"><i class="fas fa-pills"></i> Medicines</a>
+            </li>
+            <li>
+                <a href="stock.html"><i class="fas fa-boxes-stacked"></i> Stock Control</a>
+            </li>
+            <li>
+                <a href="search.html"><i class="fas fa-search"></i> Search Inventory</a>
+            </li>
+
+            <li class="nav-label">Reports & Analytics</li>
+            <li>
+                <a href="monthly-stock.html"><i class="fas fa-calendar-alt"></i> Monthly Stock</a>
+            </li>
+            <li>
+                <a href="stock-comparison.html"><i class="fas fa-balance-scale"></i> Stock Comparison</a>
+            </li>
+            <li>
+                <a href="missing-medicines.html"><i class="fas fa-exclamation-triangle"></i> Missing Stock <span class="badge">3</span></a>
+            </li>
+            <li>
+                <a href="reports.html" class="active"><i class="fas fa-chart-pie"></i> Sales Reports</a>
+            </li>
+
+            <li class="nav-label">System Control</li>
+            <li>
+                <a href="backup.html"><i class="fas fa-database"></i> Backup System</a>
+            </li>
+            <li>
+                <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+            </li>
+            <li>
+                <a href="#" id="sidebarLogout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- ============================================================ -->
+    <!-- MAIN CONTENT -->
+    <!-- ============================================================ -->
+    <main class="main-content">
+
+        <!-- Top Bar -->
+        <header class="topbar">
+            <div class="topbar-left flex items-center gap-3">
+                <button class="sidebar-toggle text-xl text-[#0a2647] p-2.5 hover:bg-gray-200/60 rounded-xl transition border border-gray-200" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-extrabold text-[#0a2647]">Analytics & Reports</h2>
+                    <p class="text-xs sm:text-sm text-gray-500">Real-time insights into your inventory performance</p>
+                </div>
+            </div>
+
+            <div class="topbar-right flex flex-wrap items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
+                <div class="user-badge">
+                    <div class="user-avatar" id="userAvatar">AD</div>
+                    <span class="text-xs font-bold text-[#0a2647]" id="userName">Admin</span>
+                </div>
+                <button class="btn-action-outline" id="refreshBtn">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+                <button id="topLogoutBtn" class="px-3.5 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition flex items-center gap-1.5 border border-red-200">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </header>
+
+        <!-- Welcome Hero Banner -->
+        <div class="bg-gradient-to-r from-[#0a2647] via-[#1a4a7a] to-[#2d9cdb] rounded-3xl p-5 sm:p-8 text-white mb-6 shadow-xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div class="relative z-10">
+                <span class="px-3.5 py-1 bg-white/10 rounded-full text-xs font-semibold tracking-wide text-blue-200 border border-white/10">
+                    <i class="fas fa-chart-line mr-1.5 text-emerald-400"></i> Live Analytics
+                </span>
+                <h1 class="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight mt-2.5">Inventory Performance Dashboard</h1>
+                <p class="text-white/80 text-xs sm:text-sm mt-1 max-w-xl">Visual insights into stock levels, categories, and trends.</p>
+            </div>
+            <div class="relative z-10 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <span class="px-4 py-2 bg-white/10 rounded-xl text-xs font-semibold border border-white/10">
+                    <i class="fas fa-calendar-alt mr-1.5"></i> Last updated: <span id="lastUpdated">Just now</span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid" id="statsGrid">
+            <!-- Injected by JS -->
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="charts-grid">
+            <!-- Pie Chart Card -->
+            <div class="chart-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-pie text-[#2d9cdb] mr-2"></i> Stock Distribution</h3>
+                    <span class="badge-count" id="pieTotal">0 items</span>
+                </div>
+                <div class="chart-container pie-chart">
+                    <canvas id="pieChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Bar Chart Card -->
+            <div class="chart-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-bar text-[#27ae60] mr-2"></i> Stock by Category</h3>
+                    <span class="badge-count" id="barTotal">0 categories</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="barChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Distribution List -->
+        <div class="chart-card" style="margin-top: 0;">
+            <div class="card-header">
+                <h3><i class="fas fa-tags text-[#8e44ad] mr-2"></i> Category Breakdown</h3>
+                <span class="badge-count" id="categoryCount">0 categories</span>
+            </div>
+            <div class="category-list" id="categoryList">
+                <!-- Injected by JS -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ============================================================ -->
+    <!-- JAVASCRIPT -->
+    <!-- ============================================================ -->
+    <script>
+        // ============================================================
+        // CHECK LOGIN
+        // ============================================================
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            window.location.href = 'login.html';
+        }
+
+        // User details & Logout
+        const userEmail = localStorage.getItem('userEmail') || 'admin@medistock.com';
+        const namePart = userEmail.split('@')[0];
+        document.getElementById('userName').textContent = namePart;
+        document.getElementById('userAvatar').textContent = namePart.substring(0, 2).toUpperCase();
+
+        function performLogout(e) {
+            if (e) e.preventDefault();
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('userEmail');
+            window.location.href = 'login.html';
+        }
+
+        document.getElementById('topLogoutBtn').addEventListener('click', performLogout);
+        document.getElementById('sidebarLogout').addEventListener('click', performLogout);
+
+        // ============================================================
+        // SIDEBAR
+        // ============================================================
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('open');
+            sidebarOverlay.classList.toggle('open');
+        }
+
+        sidebarToggle.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', toggleSidebar);
+
+        document.querySelectorAll('.sidebar-nav a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('open');
+                    sidebarOverlay.classList.remove('open');
+                }
+            });
+        });
+
+        // ============================================================
+        // HELPERS
+        // ============================================================
+        function getMedicines() {
+            const stored = localStorage.getItem('medicines');
+            if (stored) {
+                try { return JSON.parse(stored); } catch (e) { return []; }
+            }
+            return [];
+        }
+
+        function getSnapshots() {
+            const stored = localStorage.getItem('monthlySnapshots');
+            if (stored) {
+                try { return JSON.parse(stored); } catch (e) { return []; }
+            }
+            return [];
+        }
+
+        function showToast(message, type = 'success') {
+            const existing = document.querySelector('.toast-notification');
+            if (existing) existing.remove();
+
+            const colors = {
+                success: { bg: '#0a2647', icon: '#27ae60' },
+                error: { bg: '#7f1d1d', icon: '#ef4444' }
+            };
+
+            const color = colors[type] || colors.success;
+
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            toast.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}" style="color:${color.icon};"></i>
+                <span>${message}</span>
+                <button class="close-btn" onclick="this.parentElement.remove()">&times;</button>
+            `;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                if (toast.parentElement) toast.remove();
+            }, 3000);
+        }
+
+        // ============================================================
+        // CHART INSTANCES
+        // ============================================================
+        let pieChartInstance = null;
+        let barChartInstance = null;
+
+        // ============================================================
+        // COLORS
+        // ============================================================
+        const colors = [
+            '#2d9cdb', '#27ae60', '#f39c12', '#e74c3c', '#8e44ad',
+            '#1abc9c', '#e67e22', '#3498db', '#2ecc71', '#9b59b6',
+            '#1a4a7a', '#d35400', '#16a085', '#c0392b', '#2980b9'
+        ];
+
+        // ============================================================
+        // RENDER REPORTS
+        // ============================================================
+        function renderReports() {
+            const medicines = getMedicines();
+            const snapshots = getSnapshots();
+
+            // Calculate stats
+            const total = medicines.length;
+            const inStock = medicines.filter(m => m.quantity > 10).length;
+            const low = medicines.filter(m => m.quantity > 0 && m.quantity <= 10).length;
+            const out = medicines.filter(m => m.quantity === 0).length;
+            const totalQty = medicines.reduce((sum, m) => sum + (m.quantity || 0), 0);
+
+            // Category data
+            const categoryMap = {};
+            medicines.forEach(m => {
+                const cat = m.category || 'Uncategorized';
+                categoryMap[cat] = (categoryMap[cat] || 0) + 1;
+            });
+            const categories = Object.keys(categoryMap).sort();
+            const categoryCounts = categories.map(c => categoryMap[c]);
+
+            // Stats Grid
+            const statsGrid = document.getElementById('statsGrid');
+            const stats = [
+                { icon: 'fa-pills', iconClass: 'blue', number: total, label: 'Total Medicines' },
+                { icon: 'fa-check-circle', iconClass: 'green', number: inStock, label: 'In Stock (>10)' },
+                { icon: 'fa-exclamation-circle', iconClass: 'orange', number: low, label: 'Low Stock (1-10)' },
+                { icon: 'fa-times-circle', iconClass: 'red', number: out, label: 'Out of Stock' },
+                { icon: 'fa-boxes', iconClass: 'purple', number: totalQty, label: 'Total Units' },
+                { icon: 'fa-calendar-alt', iconClass: 'teal', number: snapshots.length, label: 'Snapshots Saved' }
+            ];
+
+            statsGrid.innerHTML = stats.map(s => `
+                <div class="stat-card-mini">
+                    <div class="icon ${s.iconClass}"><i class="fas ${s.icon}"></i></div>
+                    <div class="info">
+                        <div class="number">${s.number}</div>
+                        <div class="label">${s.label}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Update last updated
+            document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+
+            // Render Charts
+            renderPieChart(categories, categoryCounts, total);
+            renderBarChart(categories, categoryCounts);
+            renderCategoryList(categories, categoryCounts, total);
+
+            // Update badges
+            document.getElementById('pieTotal').textContent = total + ' items';
+            document.getElementById('barTotal').textContent = categories.length + ' categories';
+            document.getElementById('categoryCount').textContent = categories.length + ' categories';
+        }
+
+        // ============================================================
+        // PIE CHART
+        // ============================================================
+        function renderPieChart(labels, data, total) {
+            const ctx = document.getElementById('pieChart').getContext('2d');
+
+            // Destroy existing chart
+            if (pieChartInstance) {
+                pieChartInstance.destroy();
+            }
+
+            // If no data, show empty state
+            if (total === 0) {
+                pieChartInstance = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['No Data'],
+                        datasets: [{
+                            data: [1],
+                            backgroundColor: ['#e2e8f0'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+                return;
+            }
+
+            // Limit to top 6 categories, group rest as 'Other'
+            let displayLabels = [...labels];
+            let displayData = [...data];
+
+            if (labels.length > 6) {
+                const sorted = labels.map((l, i) => ({ label: l, value: data[i] }))
+                    .sort((a, b) => b.value - a.value);
+
+                const top6 = sorted.slice(0, 6);
+                const otherSum = sorted.slice(6).reduce((sum, item) => sum + item.value, 0);
+
+                displayLabels = top6.map(item => item.label);
+                displayData = top6.map(item => item.value);
+
+                if (otherSum > 0) {
+                    displayLabels.push('Others');
+                    displayData.push(otherSum);
+                }
+            }
+
+            const usedColors = displayLabels.map((_, i) => colors[i % colors.length]);
+
+            pieChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: displayLabels,
+                    datasets: [{
+                        data: displayData,
+                        backgroundColor: usedColors,
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '55%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 12,
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                font: {
+                                    size: 11,
+                                    family: 'Inter'
+                                },
+                                color: '#0a2647'
+                            }
+                        }
+                    },
+                    animation: {
+                        animateRotate: true,
+                        duration: 1000
+                    }
+                }
+            });
+        }
+
+        // ============================================================
+        // BAR CHART
+        // ============================================================
+        function renderBarChart(labels, data) {
+            const ctx = document.getElementById('barChart').getContext('2d');
+
+            if (barChartInstance) {
+                barChartInstance.destroy();
+            }
+
+            if (labels.length === 0) {
+                barChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['No Data'],
+                        datasets: [{
+                            label: 'Items',
+                            data: [0],
+                            backgroundColor: ['#e2e8f0'],
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { stepSize: 1 }
+                            }
+                        }
+                    }
+                });
+                return;
+            }
+
+            const usedColors = labels.map((_, i) => colors[i % colors.length]);
+
+            barChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Medicines',
+                        data: data,
+                        backgroundColor: usedColors,
+                        borderRadius: 6,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1,
+                                font: {
+                                    size: 10,
+                                    family: 'Inter'
+                                }
+                            },
+                            grid: {
+                                color: '#f1f5f9'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 10,
+                                    family: 'Inter'
+                                },
+                                maxRotation: 45,
+                                minRotation: 30
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 800
+                    }
+                }
+            });
+        }
+
+        // ============================================================
+        // CATEGORY LIST
+        // ============================================================
+        function renderCategoryList(labels, data, total) {
+            const container = document.getElementById('categoryList');
+
+            if (labels.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center;padding:20px;color:#94a3b8;">
+                        <i class="fas fa-inbox text-2xl mb-2 block"></i>
+                        No categories found
+                    </div>
+                `;
+                return;
+            }
+
+            // Sort by count (highest first)
+            const sorted = labels.map((l, i) => ({ label: l, value: data[i] }))
+                .sort((a, b) => b.value - a.value);
+
+            container.innerHTML = sorted.map((item, idx) => {
+                const percentage = total > 0 ? Math.round((item.value / total) * 100) : 0;
+                const color = colors[idx % colors.length];
+
+                return `
+                    <div class="category-item">
+                        <span class="color-dot" style="background:${color};"></span>
+                        <span class="cat-name">${item.label}</span>
+                        <span class="cat-count">${item.value}</span>
+                        <div class="cat-bar">
+                            <div class="fill" style="width:${percentage}%;background:${color};"></div>
+                        </div>
+                        <span style="font-size:0.7rem;color:#94a3b8;min-width:40px;text-align:right;">${percentage}%</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ============================================================
+        // REFRESH
+        // ============================================================
+        document.getElementById('refreshBtn').addEventListener('click', () => {
+            renderReports();
+            showToast('📊 Reports refreshed successfully!');
+        });
+
+        // ============================================================
+        // INIT
+        // ============================================================
+        renderReports();
+
+        console.log('%c📊 MediStock Pro - Reports', 'font-size:20px; font-weight:bold; color:#0a2647;');
+        console.log(`%c💊 ${getMedicines().length} medicines loaded`, 'font-size:13px; color:#27ae60;');
+        console.log('%c📈 Charts rendered with real-time data.', 'font-size:13px; color:#64748b;');
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,708 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stock History - MediStock Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        background: #f0f4f8;
+        overflow-x: hidden;
+      }
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 280px;
+        background: linear-gradient(180deg, #0a2647 0%, #1a4a7a 100%);
+        padding: 28px 20px;
+        overflow-y: auto;
+        z-index: 100;
+        transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        box-shadow: 4px 0 30px rgba(10, 38, 71, 0.15);
+      }
+      .sidebar::-webkit-scrollbar {
+        width: 4px;
+      }
+      .sidebar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .sidebar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 10px;
+      }
+      .sidebar-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-bottom: 28px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        margin-bottom: 28px;
+      }
+      .sidebar-brand .logo-icon {
+        width: 44px;
+        height: 44px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        color: #fff;
+        backdrop-filter: blur(8px);
+      }
+      .sidebar-brand h1 {
+        color: #fff;
+        font-size: 1.2rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+      }
+      .sidebar-brand span {
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 0.65rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        display: block;
+        margin-top: -2px;
+      }
+      .sidebar-nav {
+        list-style: none;
+        padding: 0;
+      }
+      .sidebar-nav .nav-label {
+        color: rgba(255, 255, 255, 0.25);
+        font-size: 0.65rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        padding: 12px 14px 8px;
+      }
+      .sidebar-nav li a {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 16px;
+        border-radius: 12px;
+        color: rgba(255, 255, 255, 0.55);
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.25s ease;
+      }
+      .sidebar-nav li a i {
+        width: 20px;
+        font-size: 1rem;
+        text-align: center;
+        flex-shrink: 0;
+      }
+      .sidebar-nav li a:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.06);
+      }
+      .sidebar-nav li a.active {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.1);
+        box-shadow: inset 3px 0 0 #2d9cdb;
+      }
+      .sidebar-nav li a .badge {
+        margin-left: auto;
+        background: rgba(231, 76, 60, 0.25);
+        color: #ef4444;
+        padding: 2px 10px;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        font-weight: 700;
+      }
+      .main-content {
+        margin-left: 280px;
+        padding: 28px 32px 40px;
+        min-height: 100vh;
+        transition: margin-left 0.3s ease;
+      }
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 24px;
+        border-bottom: 1px solid #e2e8f0;
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+      .topbar-left h2 {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: #0a2647;
+        letter-spacing: -0.5px;
+      }
+      .topbar-left p {
+        color: #64748b;
+        font-size: 0.9rem;
+        margin-top: 2px;
+      }
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .topbar-right .user-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #2d9cdb, #0a2647);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 700;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      .topbar-right .user-avatar:hover {
+        transform: scale(1.05);
+      }
+      .history-container {
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+
+      .history-card {
+        background: #fff;
+        border-radius: 20px;
+        border: 1px solid rgba(10, 38, 71, 0.04);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        padding: 24px 28px;
+        margin-bottom: 16px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+      .history-card:hover {
+        box-shadow: 0 8px 30px rgba(10, 38, 71, 0.06);
+        border-color: rgba(45, 156, 219, 0.1);
+      }
+      .history-card .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .history-card .header .month {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #0a2647;
+      }
+      .history-card .header .count {
+        font-size: 0.85rem;
+        color: #64748b;
+      }
+      .history-card .header .date {
+        font-size: 0.75rem;
+        color: #94a3b8;
+      }
+      .history-card .expand-btn {
+        background: none;
+        border: none;
+        color: #94a3b8;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: transform 0.3s ease;
+      }
+      .history-card .expand-btn.open {
+        transform: rotate(180deg);
+      }
+      .history-card .details {
+        display: none;
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid #f1f5f9;
+        overflow-x: auto;
+      }
+      .history-card .details.open {
+        display: block;
+      }
+      .history-card .details table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.85rem;
+      }
+      .history-card .details table thead {
+        background: #f8fafc;
+        border-bottom: 2px solid #e2e8f0;
+      }
+      .history-card .details table thead th {
+        padding: 8px 12px;
+        text-align: left;
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .history-card .details table tbody tr {
+        border-bottom: 1px solid #f1f5f9;
+      }
+      .history-card .details table tbody td {
+        padding: 8px 12px;
+        color: #0a2647;
+      }
+      .history-card .details .qty-badge {
+        display: inline-block;
+        padding: 2px 12px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.75rem;
+      }
+      .history-card .details .qty-badge.high {
+        background: rgba(39, 174, 96, 0.1);
+        color: #27ae60;
+      }
+      .history-card .details .qty-badge.medium {
+        background: rgba(243, 156, 18, 0.1);
+        color: #f39c12;
+      }
+      .history-card .details .qty-badge.low {
+        background: rgba(231, 76, 60, 0.08);
+        color: #e74c3c;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+      }
+      .empty-state .empty-icon {
+        font-size: 4rem;
+        color: #d1d5db;
+        margin-bottom: 16px;
+      }
+      .empty-state h3 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #0a2647;
+        margin-bottom: 8px;
+      }
+      .empty-state p {
+        color: #64748b;
+        font-size: 0.9rem;
+        max-width: 400px;
+        margin: 0 auto;
+      }
+
+      .btn-outline {
+        padding: 10px 20px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        background: #fff;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: "Inter", sans-serif;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .btn-outline:hover {
+        border-color: #0a2647;
+        color: #0a2647;
+        background: #f8fafc;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #0a2647, #1a4a7a);
+        color: #fff;
+        padding: 10px 24px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: "Inter", sans-serif;
+        text-decoration: none;
+      }
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(10, 38, 71, 0.2);
+      }
+
+      .toast-notification {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: #0a2647;
+        color: #fff;
+        padding: 14px 24px;
+        border-radius: 14px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        box-shadow: 0 8px 30px rgba(10, 38, 71, 0.2);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        animation: slideIn 0.4s ease;
+        max-width: 400px;
+      }
+      .toast-notification .close-btn {
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+        font-size: 1.2rem;
+        margin-left: 8px;
+      }
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      .sidebar-toggle {
+        display: none;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #0a2647;
+        cursor: pointer;
+        padding: 8px;
+      }
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(10, 38, 71, 0.3);
+        backdrop-filter: blur(4px);
+        z-index: 99;
+      }
+
+      @media (max-width: 768px) {
+        .sidebar {
+          transform: translateX(-100%);
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .sidebar-overlay.open {
+          display: block;
+        }
+        .sidebar-toggle {
+          display: block;
+        }
+        .main-content {
+          margin-left: 0;
+          padding: 16px;
+        }
+        .topbar {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        .topbar-right {
+          justify-content: flex-end;
+        }
+        .history-card {
+          padding: 16px 18px;
+        }
+        .history-card .header {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 6px;
+        }
+      }
+      @media (max-width: 480px) {
+        .topbar-left h2 {
+          font-size: 1.2rem;
+        }
+        .history-card {
+          padding: 14px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="logo-icon"><i class="fas fa-capsules"></i></div>
+        <div>
+          <h1>MediStock</h1>
+          <span>Pro v2.0</span>
+        </div>
+      </div>
+      <ul class="sidebar-nav">
+        <li class="nav-label">Main Menu</li>
+        <li>
+          <a href="dashboard.html"><i class="fas fa-th-large"></i> Dashboard</a>
+        </li>
+        <li>
+          <a href="medicines.html"><i class="fas fa-pills"></i> Medicines</a>
+        </li>
+        <li>
+          <a href="stock.html"><i class="fas fa-boxes"></i> Stock</a>
+        </li>
+        <li>
+          <a href="search.html"><i class="fas fa-search"></i> Search</a>
+        </li>
+        <li class="nav-label" style="margin-top: 12px">Reports</li>
+        <li>
+          <a href="monthly-stock.html"
+            ><i class="fas fa-calendar-alt"></i> Monthly Stock</a
+          >
+        </li>
+        <li>
+          <a href="stock-comparison.html"
+            ><i class="fas fa-balance-scale"></i> Comparison</a
+          >
+        </li>
+        <li>
+          <a href="missing-medicines.html"
+            ><i class="fas fa-exclamation-triangle"></i> Missing
+            <span class="badge" id="missingBadge">0</span></a
+          >
+        </li>
+        <li>
+          <a href="reports.html"><i class="fas fa-chart-pie"></i> Reports</a>
+        </li>
+        <li>
+          <a href="stock-history.html" class="active"
+            ><i class="fas fa-history"></i> Stock History</a
+          >
+        </li>
+        <li class="nav-label" style="margin-top: 12px">System</li>
+        <li>
+          <a href="backup.html"><i class="fas fa-database"></i> Backup</a>
+        </li>
+        <li>
+          <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+        </li>
+        <li>
+          <a href="logout.html"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </li>
+      </ul>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="sidebar-toggle" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+          </button>
+          <h2>Stock History</h2>
+          <p>View all saved monthly stock snapshots</p>
+        </div>
+        <div class="topbar-right">
+          <button class="btn-outline" id="refreshBtn">
+            <i class="fas fa-sync-alt"></i> Refresh
+          </button>
+          <div class="user-avatar" title="Admin">AD</div>
+        </div>
+      </header>
+
+      <div class="history-container" id="historyContainer">
+        <!-- Injected by JS -->
+      </div>
+    </main>
+
+    <script>
+      if (localStorage.getItem("isLoggedIn") !== "true")
+        window.location.href = "login.html";
+
+      const sidebar = document.getElementById("sidebar");
+      const sidebarOverlay = document.getElementById("sidebarOverlay");
+      const sidebarToggle = document.getElementById("sidebarToggle");
+
+      function toggleSidebar() {
+        sidebar.classList.toggle("open");
+        sidebarOverlay.classList.toggle("open");
+      }
+      sidebarToggle.addEventListener("click", toggleSidebar);
+      sidebarOverlay.addEventListener("click", toggleSidebar);
+      document.querySelectorAll(".sidebar-nav a").forEach((link) => {
+        link.addEventListener("click", () => {
+          if (window.innerWidth <= 768) {
+            sidebar.classList.remove("open");
+            sidebarOverlay.classList.remove("open");
+          }
+        });
+      });
+
+      function getSnapshots() {
+        const stored = localStorage.getItem("monthlySnapshots");
+        if (stored) {
+          try {
+            return JSON.parse(stored);
+          } catch (e) {
+            return [];
+          }
+        }
+        return [];
+      }
+
+      function showToast(message) {
+        const existing = document.querySelector(".toast-notification");
+        if (existing) existing.remove();
+        const toast = document.createElement("div");
+        toast.className = "toast-notification";
+        toast.innerHTML = `
+                <i class="fas fa-check-circle" style="color:#27ae60;"></i>
+                <span>${message}</span>
+                <button class="close-btn" onclick="this.parentElement.remove()">&times;</button>
+            `;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+          if (toast.parentElement) toast.remove();
+        }, 3000);
+      }
+
+      function renderHistory() {
+        const container = document.getElementById("historyContainer");
+        const snapshots = getSnapshots();
+
+        if (snapshots.length === 0) {
+          container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon"><i class="fas fa-history"></i></div>
+                        <h3>No History Found</h3>
+                        <p>You haven't saved any monthly snapshots yet.</p>
+                        <a href="monthly-stock.html" class="btn-primary" style="margin-top:12px;display:inline-block;">
+                            <i class="fas fa-camera"></i> Save Your First Snapshot
+                        </a>
+                    </div>
+                `;
+          return;
+        }
+
+        snapshots.sort((a, b) => b.month.localeCompare(a.month));
+
+        container.innerHTML = snapshots
+          .map((s, index) => {
+            const monthName = new Date(s.month + "-01").toLocaleString(
+              "default",
+              {
+                month: "long",
+                year: "numeric",
+              },
+            );
+            const date = new Date(s.savedAt).toLocaleString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+            const totalQty = s.stock.reduce((sum, m) => sum + m.quantity, 0);
+
+            return `
+                    <div class="history-card" id="historyCard_${index}">
+                        <div class="header" onclick="toggleDetails(${index})">
+                            <div>
+                                <div class="month">📅 ${monthName}</div>
+                                <div class="count">${s.stock.length} medicines • ${totalQty} total units</div>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:12px;">
+                                <span class="date">Saved: ${date}</span>
+                                <button class="expand-btn" id="expandBtn_${index}">
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="details" id="details_${index}">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Medicine</th>
+                                        <th>Category</th>
+                                        <th>Quantity</th>
+                                        <th>Unit</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${
+                                      s.stock.length === 0
+                                        ? `
+                                        <tr><td colspan="4" style="text-align:center;padding:20px;color:#94a3b8;">No medicines in this snapshot</td></tr>
+                                    `
+                                        : s.stock
+                                            .map((m) => {
+                                              let qtyClass = "high";
+                                              if (m.quantity === 0)
+                                                qtyClass = "low";
+                                              else if (m.quantity <= 10)
+                                                qtyClass = "medium";
+                                              return `
+                                            <tr>
+                                                <td><strong>${m.name}</strong></td>
+                                                <td>${m.category || "Uncategorized"}</td>
+                                                <td><span class="qty-badge ${qtyClass}">${m.quantity}</span></td>
+                                                <td>${m.unit || "N/A"}</td>
+                                            </tr>
+                                        `;
+                                            })
+                                            .join("")
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+          })
+          .join("");
+      }
+
+      function toggleDetails(index) {
+        const details = document.getElementById(`details_${index}`);
+        const btn = document.getElementById(`expandBtn_${index}`);
+        if (details) {
+          details.classList.toggle("open");
+          if (btn) btn.classList.toggle("open");
+        }
+      }
+
+      document.getElementById("refreshBtn").addEventListener("click", () => {
+        renderHistory();
+        showToast("History refreshed!");
+      });
+
+      renderHistory();
+      console.log(
+        "%c📜 MediStock Pro - Stock History",
+        "font-size:20px; font-weight:bold; color:#0a2647;",
+      );
+      console.log(
+        `%c📊 ${getSnapshots().length} snapshots found`,
+        "font-size:13px; color:#27ae60;",
+      );
+    </script>
+  </body>
+</html>

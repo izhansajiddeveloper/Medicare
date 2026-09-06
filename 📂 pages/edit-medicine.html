@@ -1,0 +1,1069 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Medicine - MediStock Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        background: #f0f4f8;
+        overflow-x: hidden;
+      }
+
+      /* ===== Sidebar ===== */
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 280px;
+        background: linear-gradient(180deg, #0a2647 0%, #1a4a7a 100%);
+        padding: 28px 20px;
+        overflow-y: auto;
+        z-index: 100;
+        transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        box-shadow: 4px 0 30px rgba(10, 38, 71, 0.15);
+      }
+
+      .sidebar::-webkit-scrollbar {
+        width: 4px;
+      }
+      .sidebar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .sidebar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 10px;
+      }
+
+      .sidebar-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-bottom: 28px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        margin-bottom: 28px;
+      }
+
+      .sidebar-brand .logo-icon {
+        width: 44px;
+        height: 44px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        color: #fff;
+        backdrop-filter: blur(8px);
+      }
+
+      .sidebar-brand h1 {
+        color: #fff;
+        font-size: 1.2rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+      }
+      .sidebar-brand span {
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 0.65rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        display: block;
+        margin-top: -2px;
+      }
+
+      .sidebar-nav {
+        list-style: none;
+        padding: 0;
+      }
+      .sidebar-nav .nav-label {
+        color: rgba(255, 255, 255, 0.25);
+        font-size: 0.65rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        padding: 12px 14px 8px;
+      }
+
+      .sidebar-nav li a {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 16px;
+        border-radius: 12px;
+        color: rgba(255, 255, 255, 0.55);
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.25s ease;
+      }
+
+      .sidebar-nav li a i {
+        width: 20px;
+        font-size: 1rem;
+        text-align: center;
+        flex-shrink: 0;
+      }
+      .sidebar-nav li a:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.06);
+      }
+      .sidebar-nav li a.active {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.1);
+        box-shadow: inset 3px 0 0 #2d9cdb;
+      }
+      .sidebar-nav li a .badge {
+        margin-left: auto;
+        background: rgba(231, 76, 60, 0.25);
+        color: #ef4444;
+        padding: 2px 10px;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        font-weight: 700;
+      }
+
+      /* ===== Main Content ===== */
+      .main-content {
+        margin-left: 280px;
+        padding: 28px 32px 40px;
+        min-height: 100vh;
+        transition: margin-left 0.3s ease;
+      }
+
+      /* ===== Top Bar ===== */
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 24px;
+        border-bottom: 1px solid #e2e8f0;
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+
+      .topbar-left h2 {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: #0a2647;
+        letter-spacing: -0.5px;
+      }
+      .topbar-left p {
+        color: #64748b;
+        font-size: 0.9rem;
+        margin-top: 2px;
+      }
+
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .topbar-right .user-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #2d9cdb, #0a2647);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 700;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      .topbar-right .user-avatar:hover {
+        transform: scale(1.05);
+      }
+
+      /* ===== Form Container ===== */
+      .form-container {
+        background: #fff;
+        border-radius: 20px;
+        border: 1px solid rgba(10, 38, 71, 0.04);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        padding: 32px 36px;
+        max-width: 700px;
+        margin: 0 auto;
+      }
+
+      .form-container .form-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #0a2647;
+        margin-bottom: 6px;
+      }
+
+      .form-container .form-subtitle {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin-bottom: 28px;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px 24px;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .form-group.full-width {
+        grid-column: 1 / -1;
+      }
+
+      .form-group label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #0a2647;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .form-group label .required {
+        color: #e74c3c;
+        font-weight: 700;
+      }
+
+      .form-group label i {
+        color: #94a3b8;
+        font-size: 0.8rem;
+      }
+
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        padding: 12px 16px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        font-family: "Inter", sans-serif;
+        transition: all 0.3s ease;
+        background: #f8fafc;
+        color: #0a2647;
+        outline: none;
+        width: 100%;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus,
+      .form-group textarea:focus {
+        border-color: #2d9cdb;
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(45, 156, 219, 0.08);
+      }
+
+      .form-group input::placeholder,
+      .form-group textarea::placeholder {
+        color: #94a3b8;
+      }
+
+      .form-group textarea {
+        resize: vertical;
+        min-height: 80px;
+      }
+
+      .form-group .error-text {
+        font-size: 0.75rem;
+        color: #e74c3c;
+        display: none;
+        margin-top: 2px;
+      }
+
+      .form-group.error input,
+      .form-group.error select,
+      .form-group.error textarea {
+        border-color: #e74c3c;
+        background: #fff5f5;
+      }
+
+      .form-group.error .error-text {
+        display: block;
+      }
+
+      /* ===== Form Actions ===== */
+      .form-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 28px;
+        padding-top: 24px;
+        border-top: 1px solid #f1f5f9;
+        flex-wrap: wrap;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #0a2647, #1a4a7a);
+        color: #fff;
+        padding: 12px 32px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-family: "Inter", sans-serif;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(10, 38, 71, 0.2);
+      }
+      .btn-primary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none !important;
+      }
+
+      .btn-secondary {
+        padding: 12px 28px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        background: #fff;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: "Inter", sans-serif;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn-secondary:hover {
+        border-color: #0a2647;
+        color: #0a2647;
+        background: #f8fafc;
+      }
+
+      .btn-danger-outline {
+        padding: 12px 28px;
+        border: 2px solid #fecaca;
+        border-radius: 12px;
+        background: #fef2f2;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #dc2626;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: "Inter", sans-serif;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+      }
+
+      .btn-danger-outline:hover {
+        background: #fee2e2;
+        border-color: #fca5a5;
+      }
+
+      .btn-primary .spinner {
+        display: none;
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+
+      .btn-primary.loading .spinner {
+        display: block;
+      }
+      .btn-primary.loading .btn-text {
+        display: none;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* ===== Loading State ===== */
+      .loading-state {
+        text-align: center;
+        padding: 60px 20px;
+      }
+
+      .loading-state .spinner-large {
+        width: 48px;
+        height: 48px;
+        border: 4px solid #e2e8f0;
+        border-top-color: #0a2647;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        margin: 0 auto 16px;
+      }
+
+      .loading-state h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #0a2647;
+      }
+      .loading-state p {
+        color: #64748b;
+        font-size: 0.9rem;
+      }
+
+      /* ===== Mobile Toggle ===== */
+      .sidebar-toggle {
+        display: none;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #0a2647;
+        cursor: pointer;
+        padding: 8px;
+      }
+
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(10, 38, 71, 0.3);
+        backdrop-filter: blur(4px);
+        z-index: 99;
+      }
+
+      /* ===== Responsive ===== */
+      @media (max-width: 768px) {
+        .sidebar {
+          transform: translateX(-100%);
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .sidebar-overlay.open {
+          display: block;
+        }
+        .sidebar-toggle {
+          display: block;
+        }
+
+        .main-content {
+          margin-left: 0;
+          padding: 16px;
+        }
+
+        .topbar {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        .topbar-right {
+          justify-content: flex-end;
+        }
+
+        .form-container {
+          padding: 20px;
+        }
+        .form-grid {
+          grid-template-columns: 1fr;
+          gap: 16px;
+        }
+
+        .form-actions {
+          flex-direction: column;
+        }
+        .form-actions button {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .topbar-left h2 {
+          font-size: 1.2rem;
+        }
+        .form-container {
+          padding: 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ============================================================ -->
+    <!-- SIDEBAR OVERLAY -->
+    <!-- ============================================================ -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- ============================================================ -->
+    <!-- SIDEBAR -->
+    <!-- ============================================================ -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="logo-icon"><i class="fas fa-capsules"></i></div>
+        <div>
+          <h1>MediStock</h1>
+          <span>Pro v2.0</span>
+        </div>
+      </div>
+
+      <ul class="sidebar-nav">
+        <li class="nav-label">Main Menu</li>
+        <li>
+          <a href="dashboard.html"><i class="fas fa-th-large"></i> Dashboard</a>
+        </li>
+        <li>
+          <a href="medicines.html" class="active"
+            ><i class="fas fa-pills"></i> Medicines</a
+          >
+        </li>
+        <li>
+          <a href="stock.html"><i class="fas fa-boxes"></i> Stock</a>
+        </li>
+        <li>
+          <a href="search.html"><i class="fas fa-search"></i> Search</a>
+        </li>
+
+        <li class="nav-label" style="margin-top: 12px">Reports</li>
+        <li>
+          <a href="monthly-stock.html"
+            ><i class="fas fa-calendar-alt"></i> Monthly Stock</a
+          >
+        </li>
+        <li>
+          <a href="stock-comparison.html"
+            ><i class="fas fa-balance-scale"></i> Comparison</a
+          >
+        </li>
+        <li>
+          <a href="missing-medicines.html"
+            ><i class="fas fa-exclamation-triangle"></i> Missing
+            <span class="badge">3</span></a
+          >
+        </li>
+        <li>
+          <a href="reports.html"><i class="fas fa-chart-pie"></i> Reports</a>
+        </li>
+
+        <li class="nav-label" style="margin-top: 12px">System</li>
+        <li>
+          <a href="backup.html"><i class="fas fa-database"></i> Backup</a>
+        </li>
+        <li>
+          <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+        </li>
+        <li>
+          <a href="logout.html"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- ============================================================ -->
+    <!-- MAIN CONTENT -->
+    <!-- ============================================================ -->
+    <main class="main-content">
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="sidebar-toggle" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+          </button>
+          <h2>Edit Medicine</h2>
+          <p>Update medicine details</p>
+        </div>
+        <div class="topbar-right">
+          <div class="user-avatar" title="Admin">AD</div>
+        </div>
+      </header>
+
+      <!-- ============================================================ -->
+      <!-- FORM -->
+      <!-- ============================================================ -->
+      <div class="form-container" id="formContainer">
+        <div id="loadingState" class="loading-state">
+          <div class="spinner-large"></div>
+          <h3>Loading medicine data...</h3>
+          <p>Please wait while we fetch the details</p>
+        </div>
+
+        <div id="formContent" style="display: none">
+          <div class="form-title">
+            <i class="fas fa-edit text-[#2d9cdb] mr-2"></i> Edit Medicine
+          </div>
+          <div class="form-subtitle">
+            Update the details below for
+            <strong id="medicineNameDisplay"></strong>
+          </div>
+
+          <form id="editMedicineForm" novalidate>
+            <div class="form-grid">
+              <!-- Medicine Name -->
+              <div class="form-group full-width">
+                <label>
+                  <i class="fas fa-capsules"></i> Medicine Name
+                  <span class="required">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="medName"
+                  placeholder="e.g., Paracetamol 500mg"
+                  required
+                />
+                <div class="error-text">Please enter a medicine name</div>
+              </div>
+
+              <!-- Category -->
+              <div class="form-group">
+                <label>
+                  <i class="fas fa-tag"></i> Category
+                  <span class="required">*</span>
+                </label>
+                <select id="medCategory" required>
+                  <option value="">Select Category</option>
+                  <option value="Pain Relief">Pain Relief</option>
+                  <option value="Antibiotic">Antibiotic</option>
+                  <option value="Supplements">Supplements</option>
+                  <option value="Digestive">Digestive</option>
+                  <option value="Antihistamine">Antihistamine</option>
+                  <option value="Diabetes">Diabetes</option>
+                  <option value="Cholesterol">Cholesterol</option>
+                  <option value="Blood Pressure">Blood Pressure</option>
+                  <option value="Antidepressant">Antidepressant</option>
+                  <option value="Antiviral">Antiviral</option>
+                  <option value="Antifungal">Antifungal</option>
+                  <option value="Other">Other</option>
+                </select>
+                <div class="error-text">Please select a category</div>
+              </div>
+
+              <!-- Unit -->
+              <div class="form-group">
+                <label>
+                  <i class="fas fa-weight"></i> Unit
+                  <span class="required">*</span>
+                </label>
+                <select id="medUnit" required>
+                  <option value="tablets">Tablets</option>
+                  <option value="capsules">Capsules</option>
+                  <option value="ml">ML</option>
+                  <option value="mg">MG</option>
+                  <option value="bottles">Bottles</option>
+                  <option value="vials">Vials</option>
+                  <option value="packs">Packs</option>
+                  <option value="strips">Strips</option>
+                  <option value="other">Other</option>
+                </select>
+                <div class="error-text">Please select a unit</div>
+              </div>
+
+              <!-- Quantity -->
+              <div class="form-group">
+                <label>
+                  <i class="fas fa-boxes"></i> Quantity
+                  <span class="required">*</span>
+                </label>
+                <input
+                  type="number"
+                  id="medQuantity"
+                  placeholder="0"
+                  min="0"
+                  step="1"
+                  required
+                />
+                <div class="error-text">Please enter a valid quantity</div>
+              </div>
+
+              <!-- Notes -->
+              <div class="form-group full-width">
+                <label> <i class="fas fa-sticky-note"></i> Notes </label>
+                <textarea
+                  id="medNotes"
+                  placeholder="Any additional information about this medicine..."
+                  rows="3"
+                ></textarea>
+              </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+              <button type="submit" class="btn-primary" id="submitBtn">
+                <span class="btn-text">
+                  <i class="fas fa-save"></i> Update Medicine
+                </span>
+                <span class="spinner"></span>
+              </button>
+              <button type="reset" class="btn-secondary">
+                <i class="fas fa-undo"></i> Reset
+              </button>
+              <a href="medicines.html" class="btn-danger-outline">
+                <i class="fas fa-times"></i> Cancel
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <!-- ============================================================ -->
+    <!-- JAVASCRIPT -->
+    <!-- ============================================================ -->
+    <script>
+      // ============================================================
+      // CHECK LOGIN
+      // ============================================================
+      if (localStorage.getItem("isLoggedIn") !== "true") {
+        window.location.href = "login.html";
+      }
+
+      // ============================================================
+      // SIDEBAR
+      // ============================================================
+      const sidebar = document.getElementById("sidebar");
+      const sidebarOverlay = document.getElementById("sidebarOverlay");
+      const sidebarToggle = document.getElementById("sidebarToggle");
+
+      function toggleSidebar() {
+        sidebar.classList.toggle("open");
+        sidebarOverlay.classList.toggle("open");
+      }
+
+      sidebarToggle.addEventListener("click", toggleSidebar);
+      sidebarOverlay.addEventListener("click", toggleSidebar);
+
+      document.querySelectorAll(".sidebar-nav a").forEach((link) => {
+        link.addEventListener("click", () => {
+          if (window.innerWidth <= 768) {
+            sidebar.classList.remove("open");
+            sidebarOverlay.classList.remove("open");
+          }
+        });
+      });
+
+      // ============================================================
+      // GET MEDICINE ID FROM URL
+      // ============================================================
+      function getMedicineId() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get("id");
+      }
+
+      // ============================================================
+      // DOM REFS
+      // ============================================================
+      const form = document.getElementById("editMedicineForm");
+      const submitBtn = document.getElementById("submitBtn");
+      const loadingState = document.getElementById("loadingState");
+      const formContent = document.getElementById("formContent");
+      const medicineNameDisplay = document.getElementById(
+        "medicineNameDisplay",
+      );
+
+      // Form fields
+      const nameInput = document.getElementById("medName");
+      const categorySelect = document.getElementById("medCategory");
+      const unitSelect = document.getElementById("medUnit");
+      const quantityInput = document.getElementById("medQuantity");
+      const notesTextarea = document.getElementById("medNotes");
+
+      // ============================================================
+      // LOAD MEDICINE DATA
+      // ============================================================
+      function loadMedicine() {
+        const id = parseInt(getMedicineId());
+
+        if (!id) {
+          showToast("No medicine ID provided.", "error");
+          setTimeout(() => {
+            window.location.href = "medicines.html";
+          }, 1500);
+          return;
+        }
+
+        const medicines = JSON.parse(localStorage.getItem("medicines") || "[]");
+        const medicine = medicines.find((m) => m.id === id);
+
+        if (!medicine) {
+          showToast("Medicine not found.", "error");
+          setTimeout(() => {
+            window.location.href = "medicines.html";
+          }, 1500);
+          return;
+        }
+
+        // Populate form
+        nameInput.value = medicine.name;
+        categorySelect.value = medicine.category || "";
+        unitSelect.value = medicine.unit || "tablets";
+        quantityInput.value = medicine.quantity || 0;
+        notesTextarea.value = medicine.notes || "";
+
+        medicineNameDisplay.textContent = medicine.name;
+
+        // Show form, hide loading
+        loadingState.style.display = "none";
+        formContent.style.display = "block";
+
+        // Store medicine ID for update
+        form.dataset.medicineId = medicine.id;
+      }
+
+      // ============================================================
+      // VALIDATION HELPERS
+      // ============================================================
+      function validateField(input) {
+        const group = input.closest(".form-group");
+        if (!group) return true;
+
+        const required = input.hasAttribute("required");
+        const value = input.value.trim();
+
+        if (required && !value) {
+          group.classList.add("error");
+          return false;
+        }
+
+        if (input.type === "number" && value !== "") {
+          const num = parseFloat(value);
+          const min = input.getAttribute("min");
+          if (min !== null && num < parseFloat(min)) {
+            group.classList.add("error");
+            return false;
+          }
+          if (isNaN(num)) {
+            group.classList.add("error");
+            return false;
+          }
+        }
+
+        group.classList.remove("error");
+        return true;
+      }
+
+      function validateAll() {
+        const inputs = form.querySelectorAll(
+          "input[required], select[required]",
+        );
+        let valid = true;
+        inputs.forEach((input) => {
+          if (!validateField(input)) {
+            valid = false;
+          }
+        });
+        return valid;
+      }
+
+      // Real-time validation
+      form.querySelectorAll("input, select").forEach((input) => {
+        input.addEventListener("blur", () => {
+          if (input.hasAttribute("required") || input.type === "number") {
+            validateField(input);
+          }
+        });
+
+        input.addEventListener("input", () => {
+          const group = input.closest(".form-group");
+          if (group && group.classList.contains("error")) {
+            validateField(input);
+          }
+        });
+      });
+
+      // ============================================================
+      // TOAST NOTIFICATION
+      // ============================================================
+      function showToast(message, type = "success") {
+        const existing = document.querySelector(".toast-notification");
+        if (existing) existing.remove();
+
+        const colors = {
+          success: { bg: "#0a2647", icon: "#27ae60" },
+          error: { bg: "#7f1d1d", icon: "#ef4444" },
+        };
+
+        const color = colors[type] || colors.success;
+
+        const toast = document.createElement("div");
+        toast.className = "toast-notification";
+        toast.innerHTML = `
+                <div style="
+                    position: fixed;
+                    bottom: 24px;
+                    right: 24px;
+                    background: ${color.bg};
+                    color: #fff;
+                    padding: 14px 24px;
+                    border-radius: 14px;
+                    font-size: 0.9rem;
+                    font-weight: 500;
+                    box-shadow: 0 8px 30px rgba(10,38,71,0.2);
+                    z-index: 9999;
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    animation: slideIn 0.4s ease;
+                    max-width: 400px;
+                ">
+                    <i class="fas ${type === "success" ? "fa-check-circle" : "fa-exclamation-circle"}" style="color:${color.icon};"></i>
+                    <span>${message}</span>
+                    <button onclick="this.parentElement.remove()" style="
+                        background: none;
+                        border: none;
+                        color: rgba(255,255,255,0.5);
+                        cursor: pointer;
+                        font-size: 1.2rem;
+                        margin-left: 8px;
+                    ">&times;</button>
+                </div>
+                <style>
+                    @keyframes slideIn {
+                        from { transform: translateX(100%); opacity: 0; }
+                        to { transform: translateX(0); opacity: 1; }
+                    }
+                </style>
+            `;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+          if (toast.parentElement) toast.remove();
+        }, 4000);
+      }
+
+      // ============================================================
+      // CHECK DUPLICATE (excluding current medicine)
+      // ============================================================
+      function isDuplicate(name, currentId) {
+        const medicines = JSON.parse(localStorage.getItem("medicines") || "[]");
+        return medicines.some(
+          (m) =>
+            m.name.toLowerCase() === name.toLowerCase().trim() &&
+            m.id !== currentId,
+        );
+      }
+
+      // ============================================================
+      // FORM SUBMIT
+      // ============================================================
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        if (!validateAll()) {
+          const firstError = form.querySelector(
+            ".form-group.error input, .form-group.error select",
+          );
+          if (firstError) firstError.focus();
+          showToast("Please fix all errors before submitting.", "error");
+          return;
+        }
+
+        const id = parseInt(form.dataset.medicineId);
+        const name = nameInput.value.trim();
+        const category = categorySelect.value;
+        const unit = unitSelect.value;
+        const quantity = parseInt(quantityInput.value) || 0;
+        const notes = notesTextarea.value.trim();
+
+        // Check duplicate
+        if (isDuplicate(name, id)) {
+          showToast(`"${name}" already exists in your inventory.`, "error");
+          nameInput.focus();
+          nameInput.closest(".form-group").classList.add("error");
+          return;
+        }
+
+        // Show loading
+        submitBtn.classList.add("loading");
+        submitBtn.disabled = true;
+
+        setTimeout(() => {
+          // Get all medicines
+          const medicines = JSON.parse(
+            localStorage.getItem("medicines") || "[]",
+          );
+          const index = medicines.findIndex((m) => m.id === id);
+
+          if (index === -1) {
+            showToast("Medicine not found.", "error");
+            submitBtn.classList.remove("loading");
+            submitBtn.disabled = false;
+            return;
+          }
+
+          // Update medicine
+          medicines[index] = {
+            ...medicines[index],
+            name: name,
+            category: category,
+            unit: unit,
+            quantity: quantity,
+            notes: notes,
+            updatedAt: new Date().toISOString(),
+          };
+
+          localStorage.setItem("medicines", JSON.stringify(medicines));
+
+          submitBtn.classList.remove("loading");
+          submitBtn.disabled = false;
+
+          showToast(`✅ "${name}" has been updated successfully!`);
+
+          // Redirect after delay
+          setTimeout(() => {
+            window.location.href = "medicines.html";
+          }, 1200);
+        }, 600);
+      });
+
+      // ============================================================
+      // RESET BUTTON
+      // ============================================================
+      form
+        .querySelector('button[type="reset"]')
+        .addEventListener("click", function () {
+          form
+            .querySelectorAll(".form-group.error")
+            .forEach((el) => el.classList.remove("error"));
+          // Reload original data
+          loadMedicine();
+        });
+
+      // ============================================================
+      // INIT
+      // ============================================================
+      loadMedicine();
+
+      console.log(
+        "%c✏️ MediStock Pro - Edit Medicine",
+        "font-size:20px; font-weight:bold; color:#0a2647;",
+      );
+      console.log(
+        "%c📝 Update medicine details.",
+        "font-size:13px; color:#64748b;",
+      );
+    </script>
+  </body>
+</html>

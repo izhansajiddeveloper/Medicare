@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Logout - MediStock Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        background: #f0f4f8;
+        overflow-x: hidden;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .logout-container {
+        background: #fff;
+        border-radius: 32px;
+        padding: 48px 56px;
+        max-width: 480px;
+        width: 100%;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(10, 38, 71, 0.08);
+        border: 1px solid rgba(10, 38, 71, 0.04);
+        margin: 20px;
+      }
+      .logout-icon {
+        width: 80px;
+        height: 80px;
+        background: #fef2f2;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 2.5rem;
+        color: #e74c3c;
+        border: 2px solid #fecaca;
+      }
+      .logout-container h2 {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #0a2647;
+        margin-bottom: 6px;
+      }
+      .logout-container p {
+        color: #64748b;
+        font-size: 0.95rem;
+        margin-bottom: 28px;
+      }
+      .logout-container .actions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .btn-danger {
+        background: linear-gradient(135deg, #dc2626, #b91c1c);
+        color: #fff;
+        padding: 12px 36px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-family: "Inter", sans-serif;
+        min-width: 140px;
+        justify-content: center;
+      }
+      .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(220, 38, 38, 0.25);
+      }
+      .btn-secondary {
+        padding: 12px 36px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        background: #fff;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: "Inter", sans-serif;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        min-width: 140px;
+        justify-content: center;
+      }
+      .btn-secondary:hover {
+        border-color: #0a2647;
+        color: #0a2647;
+        background: #f8fafc;
+      }
+
+      .btn-danger .spinner {
+        display: none;
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+      .btn-danger.loading .spinner {
+        display: block;
+      }
+      .btn-danger.loading .btn-text {
+        display: none;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .toast-notification {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: #0a2647;
+        color: #fff;
+        padding: 14px 24px;
+        border-radius: 14px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        box-shadow: 0 8px 30px rgba(10, 38, 71, 0.2);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        animation: slideIn 0.4s ease;
+        max-width: 400px;
+      }
+      .toast-notification .close-btn {
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+        font-size: 1.2rem;
+        margin-left: 8px;
+      }
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .logout-container {
+          padding: 32px 24px;
+        }
+        .logout-container .actions {
+          flex-direction: column;
+        }
+        .btn-danger,
+        .btn-secondary {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="logout-container">
+      <div class="logout-icon"><i class="fas fa-sign-out-alt"></i></div>
+      <h2>Logout</h2>
+      <p>Are you sure you want to sign out of your account?</p>
+
+      <div class="actions">
+        <button class="btn-danger" id="confirmLogoutBtn">
+          <span class="btn-text"
+            ><i class="fas fa-sign-out-alt"></i> Logout</span
+          >
+          <span class="spinner"></span>
+        </button>
+        <a href="dashboard.html" class="btn-secondary">
+          <i class="fas fa-times"></i> Cancel
+        </a>
+      </div>
+    </div>
+
+    <script>
+      // Check if already logged out
+      if (localStorage.getItem("isLoggedIn") !== "true") {
+        window.location.href = "login.html";
+      }
+
+      function showToast(message) {
+        const existing = document.querySelector(".toast-notification");
+        if (existing) existing.remove();
+        const toast = document.createElement("div");
+        toast.className = "toast-notification";
+        toast.innerHTML = `
+                <i class="fas fa-check-circle" style="color:#27ae60;"></i>
+                <span>${message}</span>
+                <button class="close-btn" onclick="this.parentElement.remove()">&times;</button>
+            `;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+          if (toast.parentElement) toast.remove();
+        }, 2000);
+      }
+
+      document
+        .getElementById("confirmLogoutBtn")
+        .addEventListener("click", function () {
+          this.classList.add("loading");
+          this.disabled = true;
+
+          setTimeout(() => {
+            // Clear session
+            localStorage.removeItem("isLoggedIn");
+            localStorage.removeItem("username");
+
+            showToast("👋 Logged out successfully!");
+
+            setTimeout(() => {
+              window.location.href = "login.html";
+            }, 800);
+          }, 500);
+        });
+
+      console.log(
+        "%c🚪 MediStock Pro - Logout",
+        "font-size:20px; font-weight:bold; color:#0a2647;",
+      );
+      console.log("%c👋 See you soon!", "font-size:13px; color:#64748b;");
+    </script>
+  </body>
+</html>

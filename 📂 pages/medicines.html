@@ -1,0 +1,878 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Medicines Inventory - MediStock Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        background: #f0f4f8;
+        overflow-x: hidden;
+        color: #0a2647;
+      }
+
+      /* ===== Sidebar ===== */
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 280px;
+        background: linear-gradient(180deg, #0a2647 0%, #1a4a7a 100%);
+        padding: 28px 20px;
+        overflow-y: auto;
+        z-index: 100;
+        transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        box-shadow: 4px 0 30px rgba(10, 38, 71, 0.15);
+      }
+
+      .sidebar::-webkit-scrollbar {
+        width: 4px;
+      }
+      .sidebar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .sidebar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 10px;
+      }
+
+      .sidebar-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-bottom: 28px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        margin-bottom: 28px;
+      }
+
+      .sidebar-brand .logo-icon {
+        width: 44px;
+        height: 44px;
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        color: #fff;
+        backdrop-filter: blur(8px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .sidebar-brand h1 {
+        color: #fff;
+        font-size: 1.25rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+      }
+
+      .sidebar-brand span {
+        color: #2d9cdb;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        display: block;
+      }
+
+      .sidebar-nav {
+        list-style: none;
+        padding: 0;
+      }
+
+      .sidebar-nav .nav-label {
+        color: rgba(255, 255, 255, 0.3);
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        padding: 14px 14px 8px;
+      }
+
+      .sidebar-nav li a {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 16px;
+        border-radius: 12px;
+        color: rgba(255, 255, 255, 0.65);
+        text-decoration: none;
+        font-size: 0.88rem;
+        font-weight: 500;
+        transition: all 0.25s ease;
+      }
+
+      .sidebar-nav li a i {
+        width: 20px;
+        font-size: 1rem;
+        text-align: center;
+        flex-shrink: 0;
+      }
+
+      .sidebar-nav li a:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .sidebar-nav li a.active {
+        color: #fff;
+        background: rgba(45, 156, 219, 0.2);
+        box-shadow: inset 3px 0 0 #2d9cdb;
+        font-weight: 600;
+      }
+
+      .sidebar-nav li a .badge {
+        margin-left: auto;
+        background: rgba(231, 76, 60, 0.25);
+        color: #ef4444;
+        padding: 2px 10px;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        font-weight: 700;
+      }
+
+      /* ===== Main Content ===== */
+      .main-content {
+        margin-left: 280px;
+        padding: 28px 32px 40px;
+        min-height: 100vh;
+        transition: margin-left 0.3s ease;
+      }
+
+      /* ===== Top Bar ===== */
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 24px;
+        border-bottom: 1px solid #e2e8f0;
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+
+      .topbar-left h2 {
+        font-size: 1.7rem;
+        font-weight: 800;
+        color: #0a2647;
+        letter-spacing: -0.5px;
+      }
+
+      .topbar-left p {
+        color: #64748b;
+        font-size: 0.9rem;
+        margin-top: 2px;
+      }
+
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .topbar-right .user-badge {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #fff;
+        padding: 6px 14px 6px 8px;
+        border-radius: 50px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+      }
+
+      .topbar-right .user-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0a2647, #2d9cdb);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 700;
+        font-size: 0.8rem;
+      }
+
+      /* ===== Toolbar ===== */
+      .toolbar-card {
+        background: #fff;
+        border-radius: 24px;
+        padding: 20px 24px;
+        border: 1px solid rgba(10, 38, 71, 0.05);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+        margin-bottom: 24px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .toolbar-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        flex: 1;
+      }
+
+      .toolbar-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .search-box {
+        display: flex;
+        align-items: center;
+        background: #f8fafc;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 10px 16px;
+        gap: 10px;
+        transition: all 0.3s ease;
+        min-width: 260px;
+        flex: 1;
+      }
+
+      .search-box:focus-within {
+        border-color: #2d9cdb;
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(45, 156, 219, 0.12);
+      }
+
+      .search-box input {
+        border: none;
+        outline: none;
+        background: transparent;
+        font-size: 0.88rem;
+        color: #0a2647;
+        width: 100%;
+        font-family: "Inter", sans-serif;
+      }
+
+      .filter-select {
+        padding: 10px 16px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 14px;
+        background: #f8fafc;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #0a2647;
+        font-family: "Inter", sans-serif;
+        outline: none;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .filter-select:focus {
+        border-color: #2d9cdb;
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(45, 156, 219, 0.12);
+      }
+
+      .btn-action-primary {
+        background: linear-gradient(135deg, #0a2647, #1a4a7a);
+        color: #fff;
+        padding: 10px 22px;
+        border-radius: 14px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 15px rgba(10, 38, 71, 0.15);
+        text-decoration: none;
+      }
+
+      .btn-action-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(10, 38, 71, 0.25);
+      }
+
+      .btn-action-outline {
+        padding: 10px 18px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 14px;
+        background: #fff;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn-action-outline:hover {
+        border-color: #0a2647;
+        color: #0a2647;
+        background: #f8fafc;
+      }
+
+      /* ===== Table Card ===== */
+      .table-card {
+        background: #fff;
+        border-radius: 24px;
+        border: 1px solid rgba(10, 38, 71, 0.05);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+        overflow: hidden;
+      }
+
+      .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      table.main-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+        font-size: 0.85rem;
+      }
+
+      table.main-table thead {
+        background: #f8fafc;
+        border-bottom: 1.5px solid #e2e8f0;
+      }
+
+      table.main-table th {
+        padding: 16px 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+      }
+
+      table.main-table td {
+        padding: 14px 20px;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+        color: #0a2647;
+      }
+
+      table.main-table tr:hover {
+        background: #f8fafc;
+      }
+
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 12px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.75rem;
+      }
+
+      .status-pill.instock { background: #dcfce7; color: #15803d; }
+      .status-pill.lowstock { background: #fef3c7; color: #b45309; }
+      .status-pill.outstock { background: #ffe4e6; color: #be123c; }
+
+      .action-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        background: #f1f5f9;
+        color: #64748b;
+        text-decoration: none;
+      }
+
+      .action-btn:hover { transform: scale(1.08); }
+      .action-btn.edit:hover { background: #e0f2fe; color: #0284c7; }
+      .action-btn.delete:hover { background: #ffe4e6; color: #e11d48; }
+      .action-btn.increase:hover { background: #dcfce7; color: #16a34a; }
+      .action-btn.decrease:hover { background: #fef3c7; color: #d97706; }
+
+      /* ===== Pagination ===== */
+      .pagination {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 24px;
+        border-top: 1px solid #f1f5f9;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .pagination .info {
+        font-size: 0.85rem;
+        color: #64748b;
+        font-weight: 500;
+      }
+
+      .pagination .pages {
+        display: flex;
+        gap: 6px;
+      }
+
+      .pagination .pages button {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+        color: #64748b;
+        font-weight: 700;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .pagination .pages button:hover { border-color: #0a2647; color: #0a2647; }
+      .pagination .pages button.active { background: #0a2647; color: #fff; border-color: #0a2647; }
+
+      /* Mobile Toggle & Responsiveness */
+      .sidebar-toggle {
+        display: none;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #0a2647;
+        cursor: pointer;
+      }
+
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(10, 38, 71, 0.3);
+        backdrop-filter: blur(4px);
+        z-index: 99;
+      }
+
+      @media (max-width: 768px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar.open { transform: translateX(0); }
+        .sidebar-overlay.open { display: block; }
+        .sidebar-toggle { display: inline-flex; }
+        .main-content { margin-left: 0; padding: 16px; }
+        .topbar { flex-direction: column; align-items: stretch; gap: 14px; }
+        .toolbar-card { flex-direction: column; align-items: stretch; padding: 16px; }
+        .toolbar-left, .toolbar-right { width: 100%; }
+        .search-box { width: 100%; min-width: unset; }
+      }
+
+      @media (max-width: 480px) {
+        .main-content { padding: 12px; }
+        table.main-table th, table.main-table td { padding: 10px 12px; font-size: 0.78rem; }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Sidebar Mobile Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="logo-icon"><i class="fas fa-capsules"></i></div>
+        <div>
+          <h1>MediStock</h1>
+          <span>Pro System</span>
+        </div>
+      </div>
+
+      <ul class="sidebar-nav">
+        <li class="nav-label">Main Menu</li>
+        <li>
+          <a href="dashboard.html"><i class="fas fa-th-large"></i> Dashboard</a>
+        </li>
+        <li>
+          <a href="medicines.html" class="active"><i class="fas fa-pills"></i> Medicines</a>
+        </li>
+        <li>
+          <a href="stock.html"><i class="fas fa-boxes-stacked"></i> Stock Control</a>
+        </li>
+        <li>
+          <a href="search.html"><i class="fas fa-search"></i> Search Inventory</a>
+        </li>
+
+        <li class="nav-label">Reports & Analytics</li>
+        <li>
+          <a href="monthly-stock.html"><i class="fas fa-calendar-alt"></i> Monthly Stock</a>
+        </li>
+        <li>
+          <a href="stock-comparison.html"><i class="fas fa-balance-scale"></i> Stock Comparison</a>
+        </li>
+        <li>
+          <a href="missing-medicines.html"><i class="fas fa-exclamation-triangle"></i> Missing Stock <span class="badge">3</span></a>
+        </li>
+        <li>
+          <a href="reports.html"><i class="fas fa-chart-pie"></i> Sales Reports</a>
+        </li>
+
+        <li class="nav-label">System Control</li>
+        <li>
+          <a href="backup.html"><i class="fas fa-database"></i> Backup System</a>
+        </li>
+        <li>
+          <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+        </li>
+        <li>
+          <a href="#" id="sidebarLogout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="topbar-left flex items-center gap-3">
+          <button class="sidebar-toggle text-xl text-[#0a2647] p-2.5 hover:bg-gray-200/60 rounded-xl transition border border-gray-200" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+          </button>
+          <div>
+            <h2 class="text-xl sm:text-2xl font-extrabold text-[#0a2647]">Medicines Directory</h2>
+            <p class="text-xs sm:text-sm text-gray-500">Manage and monitor all pharmacy inventory items</p>
+          </div>
+        </div>
+
+        <div class="topbar-right flex flex-wrap items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
+          <div class="user-badge">
+            <div class="user-avatar" id="userAvatar">AD</div>
+            <span class="text-xs font-bold text-[#0a2647]" id="userName">Admin</span>
+          </div>
+          <button id="topLogoutBtn" class="px-3.5 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition flex items-center gap-1.5 border border-red-200">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </button>
+        </div>
+      </header>
+
+      <!-- Welcome Hero Banner -->
+      <div class="bg-gradient-to-r from-[#0a2647] via-[#1a4a7a] to-[#2d9cdb] rounded-3xl p-5 sm:p-8 text-white mb-6 shadow-xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div class="relative z-10">
+          <span class="px-3.5 py-1 bg-white/10 rounded-full text-xs font-semibold tracking-wide text-blue-200 border border-white/10">
+            <i class="fas fa-boxes-stacked mr-1.5 text-emerald-400"></i> Stock Control Center
+          </span>
+          <h1 class="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight mt-2.5">Medicine Stock Directory</h1>
+          <p class="text-white/80 text-xs sm:text-sm mt-1 max-w-xl">Search, filter, update quantities, or add new medicines to your active store list.</p>
+        </div>
+        <div class="relative z-10 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <a href="add-medicine.html" class="px-4 sm:px-5 py-3 bg-[#27ae60] hover:bg-[#219653] text-white rounded-xl text-xs sm:text-sm font-bold shadow-lg transition flex items-center justify-center gap-2">
+            <i class="fas fa-plus"></i> Add New Medicine
+          </a>
+        </div>
+      </div>
+
+      <!-- Toolbar Card -->
+      <div class="toolbar-card">
+        <div class="toolbar-left">
+          <div class="search-box">
+            <i class="fas fa-search text-gray-400"></i>
+            <input type="text" id="searchInput" placeholder="Search by name, category, batch..." />
+          </div>
+          <select class="filter-select" id="categoryFilter">
+            <option value="all">All Categories</option>
+            <option value="Pain Relief">Pain Relief</option>
+            <option value="Antibiotic">Antibiotic</option>
+            <option value="Supplements">Supplements</option>
+            <option value="Digestive">Digestive</option>
+            <option value="Antihistamine">Antihistamine</option>
+            <option value="Diabetes">Diabetes</option>
+            <option value="Cholesterol">Cholesterol</option>
+          </select>
+          <select class="filter-select" id="stockFilter">
+            <option value="all">All Stock Levels</option>
+            <option value="in-stock">In Stock (>10)</option>
+            <option value="low">Low Stock (1-10)</option>
+            <option value="out">Out of Stock (0)</option>
+          </select>
+        </div>
+        <div class="toolbar-right">
+          <button class="btn-action-outline" id="refreshBtn"><i class="fas fa-sync-alt"></i> Refresh</button>
+          <a href="add-medicine.html" class="btn-action-primary"><i class="fas fa-plus"></i> Add Medicine</a>
+        </div>
+      </div>
+
+      <!-- Main Data Table Card -->
+      <div class="table-card">
+        <div class="table-responsive">
+          <table class="main-table">
+            <thead>
+              <tr>
+                <th><i class="fas fa-hashtag"></i> #</th>
+                <th><i class="fas fa-capsules"></i> Medicine Name</th>
+                <th><i class="fas fa-tag"></i> Category</th>
+                <th><i class="fas fa-boxes"></i> Quantity</th>
+                <th><i class="fas fa-dollar-sign"></i> Price</th>
+                <th><i class="fas fa-calendar-alt"></i> Expiry</th>
+                <th style="text-align: center;"><i class="fas fa-cog"></i> Actions</th>
+              </tr>
+            </thead>
+            <tbody id="medicinesTableBody">
+              <!-- JS Injected Rows -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination Bar -->
+        <div class="pagination">
+          <div class="info" id="paginationInfo">Showing 0 of 0 medicines</div>
+          <div class="pages" id="paginationPages">
+            <button class="active">1</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- JavaScript Data Logic -->
+    <script>
+      // Auth check
+      if (localStorage.getItem("isLoggedIn") !== "true") {
+        window.location.href = "login.html";
+      }
+
+      // User details & Logout
+      const userEmail = localStorage.getItem("userEmail") || "admin@medistock.com";
+      const namePart = userEmail.split("@")[0];
+      document.getElementById("userName").textContent = namePart;
+      document.getElementById("userAvatar").textContent = namePart.substring(0, 2).toUpperCase();
+
+      function performLogout(e) {
+        if (e) e.preventDefault();
+        localStorage.removeItem("isLoggedIn");
+        localStorage.removeItem("userEmail");
+        window.location.href = "login.html";
+      }
+
+      document.getElementById("topLogoutBtn").addEventListener("click", performLogout);
+      document.getElementById("sidebarLogout").addEventListener("click", performLogout);
+
+      // State Variables
+      let medicines = [];
+      let filteredMedicines = [];
+      let currentPage = 1;
+      const itemsPerPage = 10;
+
+      // Sidebar Mobile Toggle
+      const sidebar = document.getElementById("sidebar");
+      const sidebarOverlay = document.getElementById("sidebarOverlay");
+      const sidebarToggle = document.getElementById("sidebarToggle");
+
+      function toggleSidebar() {
+        sidebar.classList.toggle("open");
+        sidebarOverlay.classList.toggle("open");
+      }
+
+      sidebarToggle.addEventListener("click", toggleSidebar);
+      sidebarOverlay.addEventListener("click", toggleSidebar);
+
+      // Load medicines from LocalStorage
+      function loadMedicines() {
+        const stored = localStorage.getItem("medicines");
+        if (stored) {
+          try {
+            medicines = JSON.parse(stored);
+          } catch (e) {
+            medicines = [];
+          }
+        }
+
+        if (!medicines || medicines.length === 0) {
+          medicines = [
+            { id: 1, name: "Paracetamol 500mg", category: "Pain Relief", quantity: 450, price: 5.99, expiry: "2026-12-31", batch: "BAT-P001", unit: "tablets" },
+            { id: 2, name: "Amoxicillin 250mg", category: "Antibiotic", quantity: 120, price: 12.50, expiry: "2026-10-15", batch: "BAT-A002", unit: "capsules" },
+            { id: 3, name: "Vitamin C 1000mg", category: "Supplements", quantity: 18, price: 8.99, expiry: "2027-03-20", batch: "BAT-V003", unit: "tablets" },
+            { id: 4, name: "Ibuprofen 400mg", category: "Pain Relief", quantity: 0, price: 6.50, expiry: "2026-09-10", batch: "BAT-I004", unit: "tablets" },
+            { id: 5, name: "Omeprazole 20mg", category: "Digestive", quantity: 65, price: 15.75, expiry: "2026-11-05", batch: "BAT-O005", unit: "capsules" },
+            { id: 6, name: "Loratadine 10mg", category: "Antihistamine", quantity: 8, price: 9.25, expiry: "2027-01-15", batch: "BAT-L006", unit: "tablets" },
+            { id: 7, name: "Metformin 500mg", category: "Diabetes", quantity: 200, price: 11.00, expiry: "2026-08-30", batch: "BAT-M007", unit: "tablets" },
+            { id: 8, name: "Atorvastatin 20mg", category: "Cholesterol", quantity: 0, price: 22.30, expiry: "2026-07-25", batch: "BAT-A008", unit: "tablets" }
+          ];
+          saveMedicines();
+        }
+
+        applyFilters();
+      }
+
+      function saveMedicines() {
+        localStorage.setItem("medicines", JSON.stringify(medicines));
+      }
+
+      function applyFilters() {
+        const searchTerm = document.getElementById("searchInput").value.toLowerCase().trim();
+        const category = document.getElementById("categoryFilter").value;
+        const stockFilter = document.getElementById("stockFilter").value;
+
+        filteredMedicines = medicines.filter(m => {
+          const matchSearch = !searchTerm ||
+            m.name.toLowerCase().includes(searchTerm) ||
+            (m.category && m.category.toLowerCase().includes(searchTerm)) ||
+            (m.batch && m.batch.toLowerCase().includes(searchTerm));
+
+          const matchCategory = category === "all" || m.category === category;
+
+          let matchStock = true;
+          if (stockFilter === "in-stock") matchStock = Number(m.quantity) > 10;
+          else if (stockFilter === "low") matchStock = Number(m.quantity) > 0 && Number(m.quantity) <= 10;
+          else if (stockFilter === "out") matchStock = Number(m.quantity) === 0;
+
+          return matchSearch && matchCategory && matchStock;
+        });
+
+        filteredMedicines.sort((a, b) => a.name.localeCompare(b.name));
+        currentPage = 1;
+        renderTable();
+        updatePagination();
+      }
+
+      function renderTable() {
+        const tbody = document.getElementById("medicinesTableBody");
+        const start = (currentPage - 1) * itemsPerPage;
+        const pageItems = filteredMedicines.slice(start, start + itemsPerPage);
+
+        if (pageItems.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="7" class="text-center py-12 text-gray-500 font-medium">
+                <i class="fas fa-pills text-4xl text-gray-300 mb-3 block"></i>
+                No medicines found in directory.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        tbody.innerHTML = pageItems.map((m, idx) => {
+          const num = start + idx + 1;
+          const qty = Number(m.quantity) || 0;
+
+          let badgeHtml = `<span class="status-pill instock"><i class="fas fa-check"></i> In Stock</span>`;
+          if (qty === 0) {
+            badgeHtml = `<span class="status-pill outstock"><i class="fas fa-xmark"></i> Out of Stock</span>`;
+          } else if (qty <= 10) {
+            badgeHtml = `<span class="status-pill lowstock"><i class="fas fa-exclamation"></i> Low Stock</span>`;
+          }
+
+          return `
+            <tr>
+              <td class="font-bold text-gray-400">${num}</td>
+              <td>
+                <div class="font-bold text-[#0a2647]">${m.name}</div>
+                <div class="text-[11px] text-gray-400 font-mono">${m.batch || 'BAT-2026-GEN'}</div>
+              </td>
+              <td><span class="text-xs font-semibold text-gray-600 px-2.5 py-1 bg-gray-100 rounded-lg">${m.category || 'General'}</span></td>
+              <td>
+                <div class="mb-1">${badgeHtml}</div>
+                <div class="text-xs font-bold text-gray-700">${qty} ${m.unit || ''}</div>
+              </td>
+              <td class="font-bold text-gray-800">$${(Number(m.price) || 0).toFixed(2)}</td>
+              <td class="text-xs font-mono text-gray-600">${m.expiry || '2026-12-31'}</td>
+              <td>
+                <div class="flex items-center justify-center gap-1.5">
+                  <a href="edit-medicine.html?id=${m.id}" class="action-btn edit" title="Edit Medicine">
+                    <i class="fas fa-pen"></i>
+                  </a>
+                  <button onclick="deleteMedicine(${m.id})" class="action-btn delete" title="Delete Medicine">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                  <button onclick="updateQuantity(${m.id}, 1)" class="action-btn increase" title="Increase Quantity">
+                    <i class="fas fa-plus"></i>
+                  </button>
+                  <button onclick="updateQuantity(${m.id}, -1)" class="action-btn decrease" title="Decrease Quantity">
+                    <i class="fas fa-minus"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join("");
+      }
+
+      function updatePagination() {
+        const total = filteredMedicines.length;
+        const totalPages = Math.ceil(total / itemsPerPage) || 1;
+        const info = document.getElementById("paginationInfo");
+        const pages = document.getElementById("paginationPages");
+
+        const start = total > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0;
+        const end = Math.min(currentPage * itemsPerPage, total);
+        info.textContent = `Showing ${start}-${end} of ${total} medicines`;
+
+        let html = "";
+        for (let i = 1; i <= totalPages; i++) {
+          html += `<button class="${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+        }
+        pages.innerHTML = html;
+      }
+
+      function goToPage(page) {
+        currentPage = page;
+        renderTable();
+        updatePagination();
+      }
+
+      function updateQuantity(id, change) {
+        const med = medicines.find(m => m.id === id);
+        if (!med) return;
+
+        const newQty = (Number(med.quantity) || 0) + change;
+        if (newQty < 0) return;
+
+        med.quantity = newQty;
+        saveMedicines();
+        applyFilters();
+      }
+
+      function deleteMedicine(id) {
+        const med = medicines.find(m => m.id === id);
+        if (!med) return;
+
+        if (confirm(`Are you sure you want to delete "${med.name}"?`)) {
+          medicines = medicines.filter(m => m.id !== id);
+          saveMedicines();
+          applyFilters();
+        }
+      }
+
+      // Event Listeners
+      document.getElementById("searchInput").addEventListener("input", applyFilters);
+      document.getElementById("categoryFilter").addEventListener("change", applyFilters);
+      document.getElementById("stockFilter").addEventListener("change", applyFilters);
+      document.getElementById("refreshBtn").addEventListener("click", () => {
+        loadMedicines();
+      });
+
+      // Init
+      loadMedicines();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Backup - MediStock Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        background: #f0f4f8;
+        overflow-x: hidden;
+      }
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 280px;
+        background: linear-gradient(180deg, #0a2647 0%, #1a4a7a 100%);
+        padding: 28px 20px;
+        overflow-y: auto;
+        z-index: 100;
+        transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        box-shadow: 4px 0 30px rgba(10, 38, 71, 0.15);
+      }
+      .sidebar::-webkit-scrollbar {
+        width: 4px;
+      }
+      .sidebar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .sidebar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 10px;
+      }
+      .sidebar-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-bottom: 28px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        margin-bottom: 28px;
+      }
+      .sidebar-brand .logo-icon {
+        width: 44px;
+        height: 44px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        color: #fff;
+        backdrop-filter: blur(8px);
+      }
+      .sidebar-brand h1 {
+        color: #fff;
+        font-size: 1.2rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+      }
+      .sidebar-brand span {
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 0.65rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        display: block;
+        margin-top: -2px;
+      }
+      .sidebar-nav {
+        list-style: none;
+        padding: 0;
+      }
+      .sidebar-nav .nav-label {
+        color: rgba(255, 255, 255, 0.25);
+        font-size: 0.65rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        padding: 12px 14px 8px;
+      }
+      .sidebar-nav li a {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 16px;
+        border-radius: 12px;
+        color: rgba(255, 255, 255, 0.55);
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.25s ease;
+      }
+      .sidebar-nav li a i {
+        width: 20px;
+        font-size: 1rem;
+        text-align: center;
+        flex-shrink: 0;
+      }
+      .sidebar-nav li a:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.06);
+      }
+      .sidebar-nav li a.active {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.1);
+        box-shadow: inset 3px 0 0 #2d9cdb;
+      }
+      .sidebar-nav li a .badge {
+        margin-left: auto;
+        background: rgba(231, 76, 60, 0.25);
+        color: #ef4444;
+        padding: 2px 10px;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        font-weight: 700;
+      }
+      .main-content {
+        margin-left: 280px;
+        padding: 28px 32px 40px;
+        min-height: 100vh;
+        transition: margin-left 0.3s ease;
+      }
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 24px;
+        border-bottom: 1px solid #e2e8f0;
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+      .topbar-left h2 {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: #0a2647;
+        letter-spacing: -0.5px;
+      }
+      .topbar-left p {
+        color: #64748b;
+        font-size: 0.9rem;
+        margin-top: 2px;
+      }
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .topbar-right .user-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #2d9cdb, #0a2647);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 700;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      .topbar-right .user-avatar:hover {
+        transform: scale(1.05);
+      }
+
+      .backup-container {
+        max-width: 700px;
+        margin: 0 auto;
+      }
+
+      .backup-card {
+        background: #fff;
+        border-radius: 20px;
+        border: 1px solid rgba(10, 38, 71, 0.04);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        padding: 32px 36px;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+      .backup-card .icon {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 16px;
+        font-size: 2rem;
+      }
+      .backup-card .icon.export {
+        background: rgba(45, 156, 219, 0.1);
+        color: #2d9cdb;
+      }
+      .backup-card .icon.import {
+        background: rgba(39, 174, 96, 0.1);
+        color: #27ae60;
+      }
+      .backup-card h3 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #0a2647;
+      }
+      .backup-card p {
+        color: #64748b;
+        font-size: 0.9rem;
+        margin: 4px 0 16px;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #0a2647, #1a4a7a);
+        color: #fff;
+        padding: 12px 36px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-family: "Inter", sans-serif;
+      }
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(10, 38, 71, 0.2);
+      }
+      .btn-primary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none !important;
+      }
+
+      .btn-success {
+        background: linear-gradient(135deg, #27ae60, #1e8449);
+        color: #fff;
+        padding: 12px 36px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-family: "Inter", sans-serif;
+      }
+      .btn-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(39, 174, 96, 0.25);
+      }
+
+      .file-upload-wrapper {
+        position: relative;
+        display: inline-block;
+      }
+      .file-upload-wrapper input[type="file"] {
+        position: absolute;
+        left: 0;
+        top: 0;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+      }
+
+      .toast-notification {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: #0a2647;
+        color: #fff;
+        padding: 14px 24px;
+        border-radius: 14px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        box-shadow: 0 8px 30px rgba(10, 38, 71, 0.2);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        animation: slideIn 0.4s ease;
+        max-width: 400px;
+      }
+      .toast-notification .close-btn {
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+        font-size: 1.2rem;
+        margin-left: 8px;
+      }
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      .sidebar-toggle {
+        display: none;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #0a2647;
+        cursor: pointer;
+        padding: 8px;
+      }
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(10, 38, 71, 0.3);
+        backdrop-filter: blur(4px);
+        z-index: 99;
+      }
+
+      @media (max-width: 768px) {
+        .sidebar {
+          transform: translateX(-100%);
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .sidebar-overlay.open {
+          display: block;
+        }
+        .sidebar-toggle {
+          display: block;
+        }
+        .main-content {
+          margin-left: 0;
+          padding: 16px;
+        }
+        .topbar {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        .topbar-right {
+          justify-content: flex-end;
+        }
+        .backup-card {
+          padding: 24px 20px;
+        }
+      }
+      @media (max-width: 480px) {
+        .topbar-left h2 {
+          font-size: 1.2rem;
+        }
+        .backup-card {
+          padding: 20px 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="logo-icon"><i class="fas fa-capsules"></i></div>
+        <div>
+          <h1>MediStock</h1>
+          <span>Pro v2.0</span>
+        </div>
+      </div>
+      <ul class="sidebar-nav">
+        <li class="nav-label">Main Menu</li>
+        <li>
+          <a href="dashboard.html"><i class="fas fa-th-large"></i> Dashboard</a>
+        </li>
+        <li>
+          <a href="medicines.html"><i class="fas fa-pills"></i> Medicines</a>
+        </li>
+        <li>
+          <a href="stock.html"><i class="fas fa-boxes"></i> Stock</a>
+        </li>
+        <li>
+          <a href="search.html"><i class="fas fa-search"></i> Search</a>
+        </li>
+        <li class="nav-label" style="margin-top: 12px">Reports</li>
+        <li>
+          <a href="monthly-stock.html"
+            ><i class="fas fa-calendar-alt"></i> Monthly Stock</a
+          >
+        </li>
+        <li>
+          <a href="stock-comparison.html"
+            ><i class="fas fa-balance-scale"></i> Comparison</a
+          >
+        </li>
+        <li>
+          <a href="missing-medicines.html"
+            ><i class="fas fa-exclamation-triangle"></i> Missing
+            <span class="badge" id="missingBadge">0</span></a
+          >
+        </li>
+        <li>
+          <a href="reports.html"><i class="fas fa-chart-pie"></i> Reports</a>
+        </li>
+        <li>
+          <a href="stock-history.html"
+            ><i class="fas fa-history"></i> Stock History</a
+          >
+        </li>
+        <li class="nav-label" style="margin-top: 12px">System</li>
+        <li>
+          <a href="backup.html" class="active"
+            ><i class="fas fa-database"></i> Backup</a
+          >
+        </li>
+        <li>
+          <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+        </li>
+        <li>
+          <a href="logout.html"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </li>
+      </ul>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="sidebar-toggle" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+          </button>
+          <h2>Backup</h2>
+          <p>Export or import your data as JSON</p>
+        </div>
+        <div class="topbar-right">
+          <div class="user-avatar" title="Admin">AD</div>
+        </div>
+      </header>
+
+      <div class="backup-container">
+        <!-- Export -->
+        <div class="backup-card">
+          <div class="icon export"><i class="fas fa-download"></i></div>
+          <h3>Export Data</h3>
+          <p>Download all your data as a JSON file for safe keeping.</p>
+          <button class="btn-primary" id="exportBtn">
+            <i class="fas fa-file-export"></i> Export Backup
+          </button>
+        </div>
+
+        <!-- Import -->
+        <div class="backup-card">
+          <div class="icon import"><i class="fas fa-upload"></i></div>
+          <h3>Import Data</h3>
+          <p>Restore your data from a previously exported JSON file.</p>
+          <div class="file-upload-wrapper">
+            <button class="btn-success">
+              <i class="fas fa-file-import"></i> Choose File
+            </button>
+            <input type="file" id="importInput" accept=".json" />
+          </div>
+          <div
+            id="importStatus"
+            style="margin-top: 12px; font-size: 0.85rem; color: #64748b"
+          ></div>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      if (localStorage.getItem("isLoggedIn") !== "true")
+        window.location.href = "login.html";
+
+      const sidebar = document.getElementById("sidebar");
+      const sidebarOverlay = document.getElementById("sidebarOverlay");
+      const sidebarToggle = document.getElementById("sidebarToggle");
+
+      function toggleSidebar() {
+        sidebar.classList.toggle("open");
+        sidebarOverlay.classList.toggle("open");
+      }
+      sidebarToggle.addEventListener("click", toggleSidebar);
+      sidebarOverlay.addEventListener("click", toggleSidebar);
+      document.querySelectorAll(".sidebar-nav a").forEach((link) => {
+        link.addEventListener("click", () => {
+          if (window.innerWidth <= 768) {
+            sidebar.classList.remove("open");
+            sidebarOverlay.classList.remove("open");
+          }
+        });
+      });
+
+      function showToast(message, type = "success") {
+        const existing = document.querySelector(".toast-notification");
+        if (existing) existing.remove();
+        const colors = {
+          success: { bg: "#0a2647", icon: "#27ae60" },
+          error: { bg: "#7f1d1d", icon: "#ef4444" },
+        };
+        const color = colors[type] || colors.success;
+        const toast = document.createElement("div");
+        toast.className = "toast-notification";
+        toast.innerHTML = `
+                <i class="fas ${type === "success" ? "fa-check-circle" : "fa-exclamation-circle"}" style="color:${color.icon};"></i>
+                <span>${message}</span>
+                <button class="close-btn" onclick="this.parentElement.remove()">&times;</button>
+            `;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+          if (toast.parentElement) toast.remove();
+        }, 4000);
+      }
+
+      // ===== EXPORT =====
+      document
+        .getElementById("exportBtn")
+        .addEventListener("click", function () {
+          const data = {
+            version: "1.0",
+            exportDate: new Date().toISOString(),
+            data: {
+              medicines: JSON.parse(localStorage.getItem("medicines") || "[]"),
+              monthlySnapshots: JSON.parse(
+                localStorage.getItem("monthlySnapshots") || "[]",
+              ),
+              settings: JSON.parse(
+                localStorage.getItem("settings") ||
+                  '{"username":"admin","password":"admin123","threshold":10}',
+              ),
+            },
+          };
+
+          const blob = new Blob([JSON.stringify(data, null, 2)], {
+            type: "application/json",
+          });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `medistock_backup_${new Date().toISOString().slice(0, 10)}.json`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+
+          showToast("✅ Backup exported successfully!");
+        });
+
+      // ===== IMPORT =====
+      document
+        .getElementById("importInput")
+        .addEventListener("change", function (e) {
+          const file = this.files[0];
+          const status = document.getElementById("importStatus");
+
+          if (!file) {
+            status.textContent = "No file selected.";
+            return;
+          }
+
+          status.textContent = "📖 Reading file...";
+          status.style.color = "#f39c12";
+
+          const reader = new FileReader();
+          reader.onload = function (event) {
+            try {
+              const data = JSON.parse(event.target.result);
+
+              // Validate structure
+              if (!data.data || !data.data.medicines) {
+                throw new Error("Invalid backup file format.");
+              }
+
+              // Confirm before importing
+              const medicineCount = data.data.medicines.length;
+              const snapshotCount = data.data.monthlySnapshots
+                ? data.data.monthlySnapshots.length
+                : 0;
+              const currentMedicines = JSON.parse(
+                localStorage.getItem("medicines") || "[]",
+              );
+
+              if (currentMedicines.length > 0) {
+                if (
+                  !confirm(
+                    `⚠️ This will REPLACE all your current data.\n\nCurrent: ${currentMedicines.length} medicines\nBackup: ${medicineCount} medicines\n\nContinue?`,
+                  )
+                ) {
+                  status.textContent = "❌ Import cancelled.";
+                  status.style.color = "#e74c3c";
+                  document.getElementById("importInput").value = "";
+                  return;
+                }
+              }
+
+              // Import data
+              localStorage.setItem(
+                "medicines",
+                JSON.stringify(data.data.medicines || []),
+              );
+              localStorage.setItem(
+                "monthlySnapshots",
+                JSON.stringify(data.data.monthlySnapshots || []),
+              );
+              if (data.data.settings) {
+                localStorage.setItem(
+                  "settings",
+                  JSON.stringify(data.data.settings),
+                );
+              }
+
+              status.textContent = `✅ Imported ${medicineCount} medicines and ${snapshotCount} snapshots!`;
+              status.style.color = "#27ae60";
+              showToast(`✅ Successfully imported ${medicineCount} medicines!`);
+
+              // Refresh data
+              setTimeout(() => {
+                window.location.reload();
+              }, 1500);
+            } catch (error) {
+              status.textContent = `❌ Import failed: ${error.message}`;
+              status.style.color = "#e74c3c";
+              showToast("❌ Invalid backup file.", "error");
+            }
+          };
+
+          reader.onerror = function () {
+            status.textContent = "❌ Error reading file.";
+            status.style.color = "#e74c3c";
+            showToast("❌ Error reading file.", "error");
+          };
+
+          reader.readAsText(file);
+        });
+
+      console.log(
+        "%c💾 MediStock Pro - Backup",
+        "font-size:20px; font-weight:bold; color:#0a2647;",
+      );
+      console.log(
+        "%c📦 Export or import your data as JSON.",
+        "font-size:13px; color:#64748b;",
+      );
+    </script>
+  </body>
+</html>

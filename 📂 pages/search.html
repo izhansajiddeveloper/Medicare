@@ -1,0 +1,924 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Search Inventory - MediStock Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        background: #f0f4f8;
+        overflow-x: hidden;
+        color: #0a2647;
+      }
+
+      /* ===== Sidebar ===== */
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 280px;
+        background: linear-gradient(180deg, #0a2647 0%, #1a4a7a 100%);
+        padding: 28px 20px;
+        overflow-y: auto;
+        z-index: 100;
+        transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        box-shadow: 4px 0 30px rgba(10, 38, 71, 0.15);
+      }
+
+      .sidebar::-webkit-scrollbar {
+        width: 4px;
+      }
+      .sidebar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .sidebar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 10px;
+      }
+
+      .sidebar-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-bottom: 28px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        margin-bottom: 28px;
+      }
+
+      .sidebar-brand .logo-icon {
+        width: 44px;
+        height: 44px;
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        color: #fff;
+        backdrop-filter: blur(8px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .sidebar-brand h1 {
+        color: #fff;
+        font-size: 1.25rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+      }
+
+      .sidebar-brand span {
+        color: #2d9cdb;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        display: block;
+      }
+
+      .sidebar-nav {
+        list-style: none;
+        padding: 0;
+      }
+
+      .sidebar-nav .nav-label {
+        color: rgba(255, 255, 255, 0.3);
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        padding: 14px 14px 8px;
+      }
+
+      .sidebar-nav li a {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 16px;
+        border-radius: 12px;
+        color: rgba(255, 255, 255, 0.65);
+        text-decoration: none;
+        font-size: 0.88rem;
+        font-weight: 500;
+        transition: all 0.25s ease;
+      }
+
+      .sidebar-nav li a i {
+        width: 20px;
+        font-size: 1rem;
+        text-align: center;
+        flex-shrink: 0;
+      }
+
+      .sidebar-nav li a:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .sidebar-nav li a.active {
+        color: #fff;
+        background: rgba(45, 156, 219, 0.2);
+        box-shadow: inset 3px 0 0 #2d9cdb;
+        font-weight: 600;
+      }
+
+      .sidebar-nav li a .badge {
+        margin-left: auto;
+        background: rgba(231, 76, 60, 0.25);
+        color: #ef4444;
+        padding: 2px 10px;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        font-weight: 700;
+      }
+
+      /* ===== Main Content ===== */
+      .main-content {
+        margin-left: 280px;
+        padding: 28px 32px 40px;
+        min-height: 100vh;
+        transition: margin-left 0.3s ease;
+      }
+
+      /* ===== Top Bar ===== */
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 24px;
+        border-bottom: 1px solid #e2e8f0;
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+
+      .topbar-left h2 {
+        font-size: 1.7rem;
+        font-weight: 800;
+        color: #0a2647;
+        letter-spacing: -0.5px;
+      }
+
+      .topbar-left p {
+        color: #64748b;
+        font-size: 0.9rem;
+        margin-top: 2px;
+      }
+
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .topbar-right .user-badge {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #fff;
+        padding: 6px 14px 6px 8px;
+        border-radius: 50px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+      }
+
+      .topbar-right .user-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0a2647, #2d9cdb);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 700;
+        font-size: 0.8rem;
+      }
+
+      /* ===== Search Container & Card ===== */
+      .search-card {
+        background: #fff;
+        border-radius: 24px;
+        padding: 24px;
+        border: 1px solid rgba(10, 38, 71, 0.05);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+        margin-bottom: 24px;
+      }
+
+      .search-box-large {
+        display: flex;
+        align-items: center;
+        background: #f8fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 14px 20px;
+        gap: 14px;
+        transition: all 0.3s ease;
+        margin-bottom: 20px;
+      }
+
+      .search-box-large:focus-within {
+        border-color: #2d9cdb;
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(45, 156, 219, 0.12);
+      }
+
+      .search-box-large i {
+        color: #94a3b8;
+        font-size: 1.25rem;
+      }
+
+      .search-box-large input {
+        border: none;
+        outline: none;
+        background: transparent;
+        font-size: 1rem;
+        color: #0a2647;
+        width: 100%;
+        font-family: "Inter", sans-serif;
+        font-weight: 500;
+      }
+
+      .search-box-large input::placeholder {
+        color: #94a3b8;
+      }
+
+      .search-box-large .clear-btn {
+        background: none;
+        border: none;
+        color: #94a3b8;
+        cursor: pointer;
+        font-size: 1.2rem;
+        display: none;
+        transition: color 0.2s ease;
+      }
+
+      .search-box-large .clear-btn.visible {
+        display: block;
+      }
+
+      .search-box-large .clear-btn:hover {
+        color: #ef4444;
+      }
+
+      .filter-row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .filter-group {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        flex: 1;
+      }
+
+      .filter-select {
+        padding: 10px 16px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 14px;
+        background: #f8fafc;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #0a2647;
+        font-family: "Inter", sans-serif;
+        outline: none;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .filter-select:focus {
+        border-color: #2d9cdb;
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(45, 156, 219, 0.12);
+      }
+
+      .btn-action-outline {
+        padding: 10px 18px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 14px;
+        background: #fff;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn-action-outline:hover {
+        border-color: #0a2647;
+        color: #0a2647;
+        background: #f8fafc;
+      }
+
+      .results-count {
+        font-size: 0.88rem;
+        color: #64748b;
+        font-weight: 500;
+        margin-bottom: 16px;
+        padding-left: 4px;
+      }
+
+      .results-count strong {
+        color: #0a2647;
+        font-weight: 800;
+      }
+
+      /* ===== Results Container & Item Cards ===== */
+      .results-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .result-item {
+        background: #fff;
+        border-radius: 20px;
+        border: 1px solid rgba(10, 38, 71, 0.05);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+        padding: 18px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: all 0.25s ease;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+
+      .result-item:hover {
+        transform: translateY(-2px);
+        border-color: rgba(45, 156, 219, 0.3);
+        box-shadow: 0 8px 24px rgba(10, 38, 71, 0.06);
+      }
+
+      .result-item .item-info {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .result-item .item-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 14px;
+        background: rgba(45, 156, 219, 0.1);
+        color: #2d9cdb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+      }
+
+      .result-item .info .name {
+        font-weight: 800;
+        color: #0a2647;
+        font-size: 1.05rem;
+      }
+
+      .result-item .info .meta {
+        font-size: 0.8rem;
+        color: #64748b;
+        margin-top: 3px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .result-item .qty-badge {
+        font-weight: 800;
+        font-size: 0.9rem;
+        padding: 6px 16px;
+        border-radius: 50px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .result-item .qty-badge.high {
+        color: #15803d;
+        background: #dcfce7;
+      }
+
+      .result-item .qty-badge.medium {
+        color: #b45309;
+        background: #fef3c7;
+      }
+
+      .result-item .qty-badge.low {
+        color: #be123c;
+        background: #ffe4e6;
+      }
+
+      .result-item .actions {
+        display: flex;
+        gap: 8px;
+      }
+
+      .result-item .actions a {
+        padding: 8px 16px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .result-item .actions .edit-btn {
+        background: #f1f5f9;
+        color: #0a2647;
+      }
+
+      .result-item .actions .edit-btn:hover {
+        background: #e0f2fe;
+        color: #0284c7;
+      }
+
+      .result-item .actions .stock-btn {
+        background: linear-gradient(135deg, #0a2647, #1a4a7a);
+        color: #fff;
+      }
+
+      .result-item .actions .stock-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(10, 38, 71, 0.2);
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: #fff;
+        border-radius: 24px;
+        border: 1px solid rgba(10, 38, 71, 0.05);
+      }
+
+      .empty-state .empty-icon {
+        font-size: 3.5rem;
+        color: #cbd5e1;
+        margin-bottom: 14px;
+      }
+
+      .empty-state h3 {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: #0a2647;
+        margin-bottom: 6px;
+      }
+
+      .empty-state p {
+        color: #64748b;
+        font-size: 0.88rem;
+      }
+
+      /* Toast Notification */
+      .toast-notification {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: #0a2647;
+        color: #fff;
+        padding: 14px 22px;
+        border-radius: 14px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        box-shadow: 0 8px 30px rgba(10, 38, 71, 0.25);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        animation: slideIn 0.35s ease;
+        max-width: 400px;
+      }
+
+      .toast-notification .close-btn {
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.6);
+        cursor: pointer;
+        font-size: 1.1rem;
+        margin-left: auto;
+      }
+
+      @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+
+      /* Mobile Toggle & Responsiveness */
+      .sidebar-toggle {
+        display: none;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #0a2647;
+        cursor: pointer;
+      }
+
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(10, 38, 71, 0.3);
+        backdrop-filter: blur(4px);
+        z-index: 99;
+      }
+
+      @media (max-width: 768px) {
+        .sidebar { transform: translateX(-100%); }
+        .sidebar.open { transform: translateX(0); }
+        .sidebar-overlay.open { display: block; }
+        .sidebar-toggle { display: inline-flex; }
+        .main-content { margin-left: 0; padding: 16px; }
+        .topbar { flex-direction: column; align-items: stretch; gap: 14px; }
+        .search-card { padding: 16px; }
+        .filter-row { flex-direction: column; align-items: stretch; }
+        .filter-group { flex-direction: column; }
+        .result-item { flex-direction: column; align-items: stretch; }
+      }
+
+      @media (max-width: 480px) {
+        .main-content { padding: 12px; }
+        .search-box-large { padding: 10px 14px; }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Sidebar Mobile Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="logo-icon"><i class="fas fa-capsules"></i></div>
+        <div>
+          <h1>MediStock</h1>
+          <span>Pro System</span>
+        </div>
+      </div>
+
+      <ul class="sidebar-nav">
+        <li class="nav-label">Main Menu</li>
+        <li>
+          <a href="dashboard.html"><i class="fas fa-th-large"></i> Dashboard</a>
+        </li>
+        <li>
+          <a href="medicines.html"><i class="fas fa-pills"></i> Medicines</a>
+        </li>
+        <li>
+          <a href="stock.html"><i class="fas fa-boxes-stacked"></i> Stock Control</a>
+        </li>
+        <li>
+          <a href="search.html" class="active"><i class="fas fa-search"></i> Search Inventory</a>
+        </li>
+
+        <li class="nav-label">Reports & Analytics</li>
+        <li>
+          <a href="monthly-stock.html"><i class="fas fa-calendar-alt"></i> Monthly Stock</a>
+        </li>
+        <li>
+          <a href="stock-comparison.html"><i class="fas fa-balance-scale"></i> Stock Comparison</a>
+        </li>
+        <li>
+          <a href="missing-medicines.html"><i class="fas fa-exclamation-triangle"></i> Missing Stock <span class="badge">3</span></a>
+        </li>
+        <li>
+          <a href="reports.html"><i class="fas fa-chart-pie"></i> Sales Reports</a>
+        </li>
+
+        <li class="nav-label">System Control</li>
+        <li>
+          <a href="backup.html"><i class="fas fa-database"></i> Backup System</a>
+        </li>
+        <li>
+          <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+        </li>
+        <li>
+          <a href="#" id="sidebarLogout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="topbar-left flex items-center gap-3">
+          <button class="sidebar-toggle text-xl text-[#0a2647] p-2.5 hover:bg-gray-200/60 rounded-xl transition border border-gray-200" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+          </button>
+          <div>
+            <h2 class="text-xl sm:text-2xl font-extrabold text-[#0a2647]">Search Inventory</h2>
+            <p class="text-xs sm:text-sm text-gray-500">Find any medicine quickly by name, category, or batch</p>
+          </div>
+        </div>
+
+        <div class="topbar-right flex flex-wrap items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
+          <div class="user-badge">
+            <div class="user-avatar" id="userAvatar">AD</div>
+            <span class="text-xs font-bold text-[#0a2647]" id="userName">Admin</span>
+          </div>
+          <button id="topLogoutBtn" class="px-3.5 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition flex items-center gap-1.5 border border-red-200">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </button>
+        </div>
+      </header>
+
+      <!-- Hero Banner -->
+      <div class="bg-gradient-to-r from-[#0a2647] via-[#1a4a7a] to-[#2d9cdb] rounded-3xl p-5 sm:p-8 text-white mb-6 shadow-xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div class="relative z-10">
+          <span class="px-3.5 py-1 bg-white/10 rounded-full text-xs font-semibold tracking-wide text-blue-200 border border-white/10">
+            <i class="fas fa-search mr-1.5 text-blue-300"></i> Smart Search Engine
+          </span>
+          <h1 class="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight mt-2.5">Live Inventory Search</h1>
+          <p class="text-white/80 text-xs sm:text-sm mt-1 max-w-xl">Instant search by medicine name, category, or batch number across all store inventory.</p>
+        </div>
+      </div>
+
+      <!-- Search & Filters Container -->
+      <div class="search-card">
+        <div class="search-box-large">
+          <i class="fas fa-search"></i>
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Type medicine name, category, or batch code..."
+            autofocus
+          />
+          <button class="clear-btn" id="clearBtn">
+            <i class="fas fa-times-circle"></i>
+          </button>
+        </div>
+
+        <div class="filter-row">
+          <div class="filter-group">
+            <select class="filter-select" id="categoryFilter">
+              <option value="all">All Categories</option>
+            </select>
+            <select class="filter-select" id="stockFilter">
+              <option value="all">All Stock Levels</option>
+              <option value="in-stock">In Stock (>10)</option>
+              <option value="low">Low Stock (1-10)</option>
+              <option value="out">Out of Stock (0)</option>
+            </select>
+          </div>
+          <button class="btn-action-outline" id="refreshBtn"><i class="fas fa-sync-alt"></i> Refresh Search</button>
+        </div>
+      </div>
+
+      <!-- Results Count -->
+      <div class="results-count" id="resultsCount">
+        Showing <strong>0</strong> results
+      </div>
+
+      <!-- Results List -->
+      <div id="resultsContainer" class="results-list">
+        <!-- Results injected by JS -->
+      </div>
+    </main>
+
+    <!-- JavaScript Logic -->
+    <script>
+      // Auth check
+      if (localStorage.getItem("isLoggedIn") !== "true") {
+        window.location.href = "login.html";
+      }
+
+      // User details & Logout
+      const userEmail = localStorage.getItem("userEmail") || "admin@medistock.com";
+      const namePart = userEmail.split("@")[0];
+      document.getElementById("userName").textContent = namePart;
+      document.getElementById("userAvatar").textContent = namePart.substring(0, 2).toUpperCase();
+
+      function performLogout(e) {
+        if (e) e.preventDefault();
+        localStorage.removeItem("isLoggedIn");
+        localStorage.removeItem("userEmail");
+        window.location.href = "login.html";
+      }
+
+      document.getElementById("topLogoutBtn").addEventListener("click", performLogout);
+      document.getElementById("sidebarLogout").addEventListener("click", performLogout);
+
+      // Sidebar Mobile Toggle
+      const sidebar = document.getElementById("sidebar");
+      const sidebarOverlay = document.getElementById("sidebarOverlay");
+      const sidebarToggle = document.getElementById("sidebarToggle");
+
+      function toggleSidebar() {
+        sidebar.classList.toggle("open");
+        sidebarOverlay.classList.toggle("open");
+      }
+
+      sidebarToggle.addEventListener("click", toggleSidebar);
+      sidebarOverlay.addEventListener("click", toggleSidebar);
+
+      function getMedicines() {
+        const stored = localStorage.getItem("medicines");
+        if (stored) {
+          try {
+            return JSON.parse(stored);
+          } catch (e) {
+            return [];
+          }
+        }
+        return [];
+      }
+
+      function showToast(message) {
+        const existing = document.querySelector(".toast-notification");
+        if (existing) existing.remove();
+        const toast = document.createElement("div");
+        toast.className = "toast-notification";
+        toast.innerHTML = `
+          <i class="fas fa-check-circle" style="color:#27ae60; font-size:1.1rem;"></i>
+          <span>${message}</span>
+          <button class="close-btn" onclick="this.parentElement.remove()">&times;</button>
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+          if (toast.parentElement) toast.remove();
+        }, 3000);
+      }
+
+      function populateCategories() {
+        const medicines = getMedicines();
+        const categories = [
+          ...new Set(medicines.map((m) => m.category || "Uncategorized")),
+        ];
+        const select = document.getElementById("categoryFilter");
+        const currentValue = select.value;
+        select.innerHTML = '<option value="all">All Categories</option>';
+        categories.sort().forEach((c) => {
+          select.innerHTML += `<option value="${c}">${c}</option>`;
+        });
+        if (currentValue && categories.includes(currentValue))
+          select.value = currentValue;
+      }
+
+      function performSearch() {
+        const medicines = getMedicines();
+        const query = document
+          .getElementById("searchInput")
+          .value.toLowerCase()
+          .trim();
+        const category = document.getElementById("categoryFilter").value;
+        const stockFilter = document.getElementById("stockFilter").value;
+
+        let results = medicines.filter((m) => {
+          const matchQuery =
+            !query ||
+            m.name.toLowerCase().includes(query) ||
+            (m.category || "").toLowerCase().includes(query) ||
+            (m.batch || "").toLowerCase().includes(query);
+
+          const matchCategory =
+            category === "all" || (m.category || "Uncategorized") === category;
+
+          let matchStock = true;
+          const qty = Number(m.quantity) || 0;
+          if (stockFilter === "in-stock") matchStock = qty > 10;
+          else if (stockFilter === "low") matchStock = qty > 0 && qty <= 10;
+          else if (stockFilter === "out") matchStock = qty === 0;
+
+          return matchQuery && matchCategory && matchStock;
+        });
+
+        results.sort((a, b) => a.name.localeCompare(b.name));
+
+        document.getElementById("resultsCount").innerHTML =
+          `Showing <strong>${results.length}</strong> results`;
+        renderResults(results);
+      }
+
+      function renderResults(results) {
+        const container = document.getElementById("resultsContainer");
+
+        if (results.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-icon"><i class="fas fa-search"></i></div>
+              <h3>No matching medicines found</h3>
+              <p>Try adjusting your search terms or filters.</p>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = results
+          .map((m) => {
+            const qty = Number(m.quantity) || 0;
+            let qtyClass = "high";
+            let qtyLabel = `<i class="fas fa-check"></i> ${qty} ${m.unit || 'units'}`;
+
+            if (qty === 0) {
+              qtyClass = "low";
+              qtyLabel = `<i class="fas fa-xmark"></i> Out of Stock (${qty})`;
+            } else if (qty <= 10) {
+              qtyClass = "medium";
+              qtyLabel = `<i class="fas fa-exclamation"></i> Low Stock (${qty})`;
+            }
+
+            return `
+              <div class="result-item">
+                <div class="item-info">
+                  <div class="item-icon">
+                    <i class="fas fa-capsules"></i>
+                  </div>
+                  <div class="info">
+                    <div class="name">${m.name}</div>
+                    <div class="meta">
+                      <span class="font-semibold text-gray-700">${m.category || "Uncategorized"}</span>
+                      <span>•</span>
+                      <span class="font-mono text-gray-500">${m.batch ? "Batch: " + m.batch : "BAT-2026-GEN"}</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="qty-badge ${qtyClass}">${qtyLabel}</div>
+                <div class="actions">
+                  <a href="edit-medicine.html?id=${m.id}" class="edit-btn"><i class="fas fa-pen"></i> Edit</a>
+                  <a href="stock.html" class="stock-btn"><i class="fas fa-boxes-stacked"></i> Stock Control</a>
+                </div>
+              </div>
+            `;
+          })
+          .join("");
+      }
+
+      document
+        .getElementById("searchInput")
+        .addEventListener("input", function () {
+          const clearBtn = document.getElementById("clearBtn");
+          if (this.value.length > 0) {
+            clearBtn.classList.add("visible");
+          } else {
+            clearBtn.classList.remove("visible");
+          }
+          performSearch();
+        });
+
+      document
+        .getElementById("clearBtn")
+        .addEventListener("click", function () {
+          document.getElementById("searchInput").value = "";
+          this.classList.remove("visible");
+          performSearch();
+          document.getElementById("searchInput").focus();
+        });
+
+      document
+        .getElementById("categoryFilter")
+        .addEventListener("change", performSearch);
+      document
+        .getElementById("stockFilter")
+        .addEventListener("change", performSearch);
+
+      document.getElementById("refreshBtn").addEventListener("click", () => {
+        populateCategories();
+        performSearch();
+        showToast("Search results refreshed!");
+      });
+
+      // Check for search query from dashboard
+      const savedQuery = localStorage.getItem("searchQuery");
+      if (savedQuery) {
+        document.getElementById("searchInput").value = savedQuery;
+        document.getElementById("clearBtn").classList.add("visible");
+        localStorage.removeItem("searchQuery");
+        setTimeout(performSearch, 100);
+      }
+
+      populateCategories();
+      performSearch();
+    </script>
+  </body>
+</html>

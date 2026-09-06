@@ -1,0 +1,1191 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Monthly Stock - MediStock Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        background: #f0f4f8;
+        overflow-x: hidden;
+      }
+
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 280px;
+        background: linear-gradient(180deg, #0a2647 0%, #1a4a7a 100%);
+        padding: 28px 20px;
+        overflow-y: auto;
+        z-index: 100;
+        transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        box-shadow: 4px 0 30px rgba(10, 38, 71, 0.15);
+      }
+
+      .sidebar::-webkit-scrollbar {
+        width: 4px;
+      }
+      .sidebar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .sidebar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 10px;
+      }
+
+      .sidebar-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-bottom: 28px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        margin-bottom: 28px;
+      }
+
+      .sidebar-brand .logo-icon {
+        width: 44px;
+        height: 44px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        color: #fff;
+        backdrop-filter: blur(8px);
+      }
+
+      .sidebar-brand h1 {
+        color: #fff;
+        font-size: 1.2rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+      }
+      .sidebar-brand span {
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 0.65rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        display: block;
+        margin-top: -2px;
+      }
+
+      .sidebar-nav {
+        list-style: none;
+        padding: 0;
+      }
+      .sidebar-nav .nav-label {
+        color: rgba(255, 255, 255, 0.25);
+        font-size: 0.65rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        padding: 12px 14px 8px;
+      }
+
+      .sidebar-nav li a {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 16px;
+        border-radius: 12px;
+        color: rgba(255, 255, 255, 0.55);
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.25s ease;
+      }
+
+      .sidebar-nav li a i {
+        width: 20px;
+        font-size: 1rem;
+        text-align: center;
+        flex-shrink: 0;
+      }
+      .sidebar-nav li a:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.06);
+      }
+      .sidebar-nav li a.active {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.1);
+        box-shadow: inset 3px 0 0 #2d9cdb;
+      }
+      .sidebar-nav li a .badge {
+        margin-left: auto;
+        background: rgba(231, 76, 60, 0.25);
+        color: #ef4444;
+        padding: 2px 10px;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        font-weight: 700;
+      }
+
+      .main-content {
+        margin-left: 280px;
+        padding: 28px 32px 40px;
+        min-height: 100vh;
+        transition: margin-left 0.3s ease;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 24px;
+        border-bottom: 1px solid #e2e8f0;
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+
+      .topbar-left h2 {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: #0a2647;
+        letter-spacing: -0.5px;
+      }
+      .topbar-left p {
+        color: #64748b;
+        font-size: 0.9rem;
+        margin-top: 2px;
+      }
+
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .topbar-right .user-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #2d9cdb, #0a2647);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 700;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      .topbar-right .user-avatar:hover {
+        transform: scale(1.05);
+      }
+
+      /* ===== Monthly Stock Container ===== */
+      .monthly-container {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      .snapshot-card {
+        background: #fff;
+        border-radius: 20px;
+        border: 1px solid rgba(10, 38, 71, 0.04);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        padding: 32px 36px;
+        margin-bottom: 28px;
+      }
+
+      .snapshot-card .card-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #0a2647;
+        margin-bottom: 6px;
+      }
+
+      .snapshot-card .card-subtitle {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin-bottom: 20px;
+      }
+
+      .snapshot-card .month-selector {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+      }
+
+      .snapshot-card .month-selector input[type="month"] {
+        padding: 10px 16px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        font-family: "Inter", sans-serif;
+        color: #0a2647;
+        background: #f8fafc;
+        outline: none;
+        transition: all 0.3s ease;
+      }
+
+      .snapshot-card .month-selector input[type="month"]:focus {
+        border-color: #2d9cdb;
+        box-shadow: 0 0 0 4px rgba(45, 156, 219, 0.08);
+        background: #fff;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #0a2647, #1a4a7a);
+        color: #fff;
+        padding: 10px 28px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: "Inter", sans-serif;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(10, 38, 71, 0.2);
+      }
+      .btn-primary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none !important;
+      }
+
+      .btn-primary .spinner {
+        display: none;
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+
+      .btn-primary.loading .spinner {
+        display: block;
+      }
+      .btn-primary.loading .btn-text {
+        display: none;
+      }
+
+      .btn-secondary {
+        padding: 10px 24px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        background: #fff;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: "Inter", sans-serif;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn-secondary:hover {
+        border-color: #0a2647;
+        color: #0a2647;
+        background: #f8fafc;
+      }
+
+      .btn-outline-danger {
+        padding: 10px 24px;
+        border: 2px solid #fecaca;
+        border-radius: 12px;
+        background: #fef2f2;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #dc2626;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: "Inter", sans-serif;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn-outline-danger:hover {
+        background: #fee2e2;
+        border-color: #fca5a5;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* ===== Snapshot Preview ===== */
+      .preview-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 16px;
+      }
+
+      .preview-table thead {
+        background: #f8fafc;
+        border-bottom: 2px solid #e2e8f0;
+      }
+
+      .preview-table thead th {
+        padding: 10px 14px;
+        text-align: left;
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .preview-table tbody tr {
+        border-bottom: 1px solid #f1f5f9;
+      }
+
+      .preview-table tbody td {
+        padding: 8px 14px;
+        font-size: 0.85rem;
+        color: #0a2647;
+      }
+
+      .preview-table .qty-badge {
+        display: inline-block;
+        padding: 2px 12px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.8rem;
+      }
+
+      .preview-table .qty-badge.high {
+        background: rgba(39, 174, 96, 0.1);
+        color: #27ae60;
+      }
+      .preview-table .qty-badge.medium {
+        background: rgba(243, 156, 18, 0.1);
+        color: #f39c12;
+      }
+      .preview-table .qty-badge.low {
+        background: rgba(231, 76, 60, 0.08);
+        color: #e74c3c;
+      }
+
+      .preview-table .empty-row td {
+        text-align: center;
+        padding: 30px 0;
+        color: #94a3b8;
+        font-size: 0.9rem;
+      }
+
+      /* ===== Saved Snapshots ===== */
+      .history-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .history-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 20px;
+        background: #f8fafc;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s ease;
+      }
+
+      .history-item:hover {
+        border-color: #2d9cdb;
+      }
+
+      .history-item .left {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .history-item .left .month {
+        font-weight: 700;
+        color: #0a2647;
+      }
+      .history-item .left .count {
+        font-size: 0.85rem;
+        color: #64748b;
+      }
+      .history-item .left .date {
+        font-size: 0.75rem;
+        color: #94a3b8;
+      }
+
+      .history-item .right {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .history-empty {
+        text-align: center;
+        padding: 40px 20px;
+        color: #94a3b8;
+      }
+
+      .history-empty i {
+        font-size: 2.5rem;
+        display: block;
+        margin-bottom: 12px;
+        opacity: 0.5;
+      }
+
+      /* ===== Toast ===== */
+      .toast-notification {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: #0a2647;
+        color: #fff;
+        padding: 14px 24px;
+        border-radius: 14px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        box-shadow: 0 8px 30px rgba(10, 38, 71, 0.2);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        animation: slideIn 0.4s ease;
+        max-width: 400px;
+      }
+
+      .toast-notification .close-btn {
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+        font-size: 1.2rem;
+        margin-left: 8px;
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      /* ===== Mobile Toggle ===== */
+      .sidebar-toggle {
+        display: none;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #0a2647;
+        cursor: pointer;
+        padding: 8px;
+      }
+
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(10, 38, 71, 0.3);
+        backdrop-filter: blur(4px);
+        z-index: 99;
+      }
+
+      /* ===== Responsive ===== */
+      @media (max-width: 768px) {
+        .sidebar {
+          transform: translateX(-100%);
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .sidebar-overlay.open {
+          display: block;
+        }
+        .sidebar-toggle {
+          display: block;
+        }
+
+        .main-content {
+          margin-left: 0;
+          padding: 16px;
+        }
+
+        .topbar {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        .topbar-right {
+          justify-content: flex-end;
+        }
+
+        .snapshot-card {
+          padding: 20px;
+        }
+        .snapshot-card .month-selector {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .history-item {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 8px;
+        }
+        .history-item .right {
+          justify-content: flex-start;
+        }
+
+        .preview-table {
+          font-size: 0.8rem;
+        }
+        .preview-table thead th,
+        .preview-table tbody td {
+          padding: 6px 10px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .topbar-left h2 {
+          font-size: 1.2rem;
+        }
+        .snapshot-card {
+          padding: 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ============================================================ -->
+    <!-- SIDEBAR OVERLAY -->
+    <!-- ============================================================ -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- ============================================================ -->
+    <!-- SIDEBAR -->
+    <!-- ============================================================ -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="logo-icon"><i class="fas fa-capsules"></i></div>
+        <div>
+          <h1>MediStock</h1>
+          <span>Pro v2.0</span>
+        </div>
+      </div>
+
+      <ul class="sidebar-nav">
+        <li class="nav-label">Main Menu</li>
+        <li>
+          <a href="dashboard.html"><i class="fas fa-th-large"></i> Dashboard</a>
+        </li>
+        <li>
+          <a href="medicines.html"><i class="fas fa-pills"></i> Medicines</a>
+        </li>
+        <li>
+          <a href="stock.html"><i class="fas fa-boxes"></i> Stock</a>
+        </li>
+        <li>
+          <a href="search.html"><i class="fas fa-search"></i> Search</a>
+        </li>
+
+        <li class="nav-label" style="margin-top: 12px">Reports</li>
+        <li>
+          <a href="monthly-stock.html" class="active"
+            ><i class="fas fa-calendar-alt"></i> Monthly Stock</a
+          >
+        </li>
+        <li>
+          <a href="stock-comparison.html"
+            ><i class="fas fa-balance-scale"></i> Comparison</a
+          >
+        </li>
+        <li>
+          <a href="missing-medicines.html"
+            ><i class="fas fa-exclamation-triangle"></i> Missing
+            <span class="badge">3</span></a
+          >
+        </li>
+        <li>
+          <a href="reports.html"><i class="fas fa-chart-pie"></i> Reports</a>
+        </li>
+
+        <li class="nav-label" style="margin-top: 12px">System</li>
+        <li>
+          <a href="backup.html"><i class="fas fa-database"></i> Backup</a>
+        </li>
+        <li>
+          <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+        </li>
+        <li>
+          <a href="logout.html"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- ============================================================ -->
+    <!-- MAIN CONTENT -->
+    <!-- ============================================================ -->
+    <main class="main-content">
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="sidebar-toggle" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+          </button>
+          <h2>Monthly Stock</h2>
+          <p>Save and manage monthly starting stock snapshots</p>
+        </div>
+        <div class="topbar-right">
+          <div class="user-avatar" title="Admin">AD</div>
+        </div>
+      </header>
+
+      <!-- ============================================================ -->
+      <!-- MONTHLY STOCK CONTAINER -->
+      <!-- ============================================================ -->
+      <div class="monthly-container">
+        <!-- ===== Save Snapshot ===== -->
+        <div class="snapshot-card">
+          <div class="card-title">
+            <i class="fas fa-camera text-[#2d9cdb] mr-2"></i> Save Monthly
+            Snapshot
+          </div>
+          <div class="card-subtitle">
+            Capture the current stock as the starting stock for a month.
+          </div>
+
+          <div class="month-selector">
+            <input type="month" id="monthPicker" />
+            <button class="btn-primary" id="saveSnapshotBtn">
+              <span class="btn-text"
+                ><i class="fas fa-save"></i> Save Snapshot</span
+              >
+              <span class="spinner"></span>
+            </button>
+            <button class="btn-secondary" id="previewBtn">
+              <i class="fas fa-eye"></i> Preview
+            </button>
+          </div>
+
+          <!-- Preview Table -->
+          <div id="previewContainer" style="display: none">
+            <div
+              style="
+                font-size: 0.85rem;
+                font-weight: 600;
+                color: #0a2647;
+                margin-bottom: 8px;
+              "
+            >
+              <i class="fas fa-list mr-2"></i> Current Stock Preview
+            </div>
+            <div style="overflow-x: auto">
+              <table class="preview-table" id="previewTable">
+                <thead>
+                  <tr>
+                    <th>Medicine</th>
+                    <th>Category</th>
+                    <th>Quantity</th>
+                    <th>Unit</th>
+                  </tr>
+                </thead>
+                <tbody id="previewBody">
+                  <!-- Injected by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== Saved Snapshots ===== -->
+        <div class="snapshot-card">
+          <div class="card-title">
+            <i class="fas fa-history text-[#f39c12] mr-2"></i> Saved Snapshots
+          </div>
+          <div class="card-subtitle">
+            All monthly starting stock snapshots you've saved.
+          </div>
+
+          <div id="historyList" class="history-list">
+            <!-- Injected by JS -->
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ============================================================ -->
+    <!-- JAVASCRIPT -->
+    <!-- ============================================================ -->
+    <script>
+      // ============================================================
+      // CHECK LOGIN
+      // ============================================================
+      if (localStorage.getItem("isLoggedIn") !== "true") {
+        window.location.href = "login.html";
+      }
+
+      // ============================================================
+      // SIDEBAR
+      // ============================================================
+      const sidebar = document.getElementById("sidebar");
+      const sidebarOverlay = document.getElementById("sidebarOverlay");
+      const sidebarToggle = document.getElementById("sidebarToggle");
+
+      function toggleSidebar() {
+        sidebar.classList.toggle("open");
+        sidebarOverlay.classList.toggle("open");
+      }
+
+      sidebarToggle.addEventListener("click", toggleSidebar);
+      sidebarOverlay.addEventListener("click", toggleSidebar);
+
+      document.querySelectorAll(".sidebar-nav a").forEach((link) => {
+        link.addEventListener("click", () => {
+          if (window.innerWidth <= 768) {
+            sidebar.classList.remove("open");
+            sidebarOverlay.classList.remove("open");
+          }
+        });
+      });
+
+      // ============================================================
+      // DOM REFS
+      // ============================================================
+      const monthPicker = document.getElementById("monthPicker");
+      const saveBtn = document.getElementById("saveSnapshotBtn");
+      const previewBtn = document.getElementById("previewBtn");
+      const previewContainer = document.getElementById("previewContainer");
+      const previewBody = document.getElementById("previewBody");
+      const historyList = document.getElementById("historyList");
+
+      // ============================================================
+      // SET DEFAULT MONTH
+      // ============================================================
+      function setDefaultMonth() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, "0");
+        monthPicker.value = `${year}-${month}`;
+      }
+
+      // ============================================================
+      // GET MEDICINES
+      // ============================================================
+      function getMedicines() {
+        const stored = localStorage.getItem("medicines");
+        if (stored) {
+          try {
+            return JSON.parse(stored);
+          } catch (e) {
+            return [];
+          }
+        }
+        return [];
+      }
+
+      // ============================================================
+      // GET SNAPSHOTS
+      // ============================================================
+      function getSnapshots() {
+        const stored = localStorage.getItem("monthlySnapshots");
+        if (stored) {
+          try {
+            return JSON.parse(stored);
+          } catch (e) {
+            return [];
+          }
+        }
+        return [];
+      }
+
+      // ============================================================
+      // SAVE SNAPSHOTS
+      // ============================================================
+      function saveSnapshots(snapshots) {
+        localStorage.setItem("monthlySnapshots", JSON.stringify(snapshots));
+      }
+
+      // ============================================================
+      // PREVIEW STOCK
+      // ============================================================
+      function renderPreview() {
+        const medicines = getMedicines();
+
+        if (medicines.length === 0) {
+          previewBody.innerHTML = `
+                    <tr class="empty-row">
+                        <td colspan="4">No medicines found. Add some medicines first.</td>
+                    </tr>
+                `;
+          previewContainer.style.display = "block";
+          return;
+        }
+
+        previewBody.innerHTML = medicines
+          .map((m) => {
+            let qtyClass = "high";
+            if (m.quantity === 0) qtyClass = "low";
+            else if (m.quantity <= 10) qtyClass = "medium";
+
+            return `
+                    <tr>
+                        <td><strong>${m.name}</strong></td>
+                        <td>${m.category || "Uncategorized"}</td>
+                        <td><span class="qty-badge ${qtyClass}">${m.quantity}</span></td>
+                        <td>${m.unit || "N/A"}</td>
+                    </tr>
+                `;
+          })
+          .join("");
+
+        previewContainer.style.display = "block";
+      }
+
+      // ============================================================
+      // RENDER HISTORY
+      // ============================================================
+      function renderHistory() {
+        const snapshots = getSnapshots();
+
+        if (snapshots.length === 0) {
+          historyList.innerHTML = `
+                    <div class="history-empty">
+                        <i class="fas fa-calendar-alt"></i>
+                        <p>No snapshots saved yet.</p>
+                        <p style="font-size:0.85rem;">Save your first monthly snapshot above.</p>
+                    </div>
+                `;
+          return;
+        }
+
+        // Sort by month (newest first)
+        snapshots.sort((a, b) => b.month.localeCompare(a.month));
+
+        historyList.innerHTML = snapshots
+          .map((s) => {
+            const monthName = new Date(s.month + "-01").toLocaleString(
+              "default",
+              {
+                month: "long",
+                year: "numeric",
+              },
+            );
+            const date = new Date(s.savedAt).toLocaleString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+
+            return `
+                    <div class="history-item">
+                        <div class="left">
+                            <div class="month">${monthName}</div>
+                            <div class="count">${s.stock.length} medicines</div>
+                            <div class="date">Saved: ${date}</div>
+                        </div>
+                        <div class="right">
+                            <button class="btn-secondary" onclick="viewSnapshot('${s.month}')" style="padding:6px 14px;font-size:0.75rem;">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                            <button class="btn-outline-danger" onclick="deleteSnapshot('${s.month}')" style="padding:6px 14px;font-size:0.75rem;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+          })
+          .join("");
+      }
+
+      // ============================================================
+      // VIEW SNAPSHOT
+      // ============================================================
+      function viewSnapshot(month) {
+        const snapshots = getSnapshots();
+        const snapshot = snapshots.find((s) => s.month === month);
+
+        if (!snapshot) {
+          showToast("Snapshot not found.", "error");
+          return;
+        }
+
+        const monthName = new Date(month + "-01").toLocaleString("default", {
+          month: "long",
+          year: "numeric",
+        });
+
+        let html = `
+                <div style="background:#f8fafc;border-radius:12px;padding:16px 20px;margin-bottom:12px;border:1px solid #e2e8f0;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                        <span style="font-weight:700;color:#0a2647;">📅 ${monthName}</span>
+                        <span style="font-size:0.8rem;color:#64748b;">${snapshot.stock.length} medicines</span>
+                    </div>
+                </div>
+                <div style="overflow-x:auto;max-height:400px;overflow-y:auto;">
+                    <table class="preview-table">
+                        <thead>
+                            <tr>
+                                <th>Medicine</th>
+                                <th>Category</th>
+                                <th>Quantity</th>
+                                <th>Unit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${
+                              snapshot.stock.length === 0
+                                ? `
+                                <tr class="empty-row"><td colspan="4">No medicines in this snapshot.</td></tr>
+                            `
+                                : snapshot.stock
+                                    .map(
+                                      (m) => `
+                                <tr>
+                                    <td><strong>${m.name}</strong></td>
+                                    <td>${m.category || "Uncategorized"}</td>
+                                    <td><span class="qty-badge ${m.quantity === 0 ? "low" : m.quantity <= 10 ? "medium" : "high"}">${m.quantity}</span></td>
+                                    <td>${m.unit || "N/A"}</td>
+                                </tr>
+                            `,
+                                    )
+                                    .join("")
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+        // Show in a modal-like popup
+        const overlay = document.createElement("div");
+        overlay.style.cssText = `
+                position: fixed;
+                inset: 0;
+                background: rgba(10,38,71,0.4);
+                backdrop-filter: blur(4px);
+                z-index: 9998;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+                animation: fadeIn 0.3s ease;
+            `;
+        overlay.innerHTML = `
+                <div style="
+                    background: #fff;
+                    border-radius: 20px;
+                    padding: 32px 36px;
+                    max-width: 700px;
+                    width: 100%;
+                    max-height: 80vh;
+                    overflow-y: auto;
+                    box-shadow: 0 20px 60px rgba(10,38,71,0.2);
+                ">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                        <h3 style="font-size:1.2rem;font-weight:700;color:#0a2647;">Snapshot Details</h3>
+                        <button onclick="this.closest('[style*=\\'position: fixed\\']').remove()" style="
+                            background:none;border:none;font-size:1.5rem;color:#94a3b8;cursor:pointer;
+                        ">&times;</button>
+                    </div>
+                    ${html}
+                </div>
+            `;
+        document.body.appendChild(overlay);
+
+        // Click outside to close
+        overlay.addEventListener("click", (e) => {
+          if (e.target === overlay) overlay.remove();
+        });
+
+        // Add fadeIn animation
+        const style = document.createElement("style");
+        style.textContent = `
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: scale(0.95); }
+                    to { opacity: 1; transform: scale(1); }
+                }
+            `;
+        document.head.appendChild(style);
+      }
+
+      // ============================================================
+      // DELETE SNAPSHOT
+      // ============================================================
+      function deleteSnapshot(month) {
+        const monthName = new Date(month + "-01").toLocaleString("default", {
+          month: "long",
+          year: "numeric",
+        });
+
+        if (
+          !confirm(
+            `Are you sure you want to delete the snapshot for ${monthName}?`,
+          )
+        ) {
+          return;
+        }
+
+        let snapshots = getSnapshots();
+        snapshots = snapshots.filter((s) => s.month !== month);
+        saveSnapshots(snapshots);
+        renderHistory();
+        showToast(`🗑️ Snapshot for ${monthName} deleted.`, "success");
+      }
+
+      // ============================================================
+      // SAVE SNAPSHOT
+      // ============================================================
+      function saveSnapshot() {
+        const month = monthPicker.value;
+
+        if (!month) {
+          showToast("Please select a month.", "error");
+          return;
+        }
+
+        const medicines = getMedicines();
+
+        if (medicines.length === 0) {
+          showToast("No medicines to save. Add some medicines first.", "error");
+          return;
+        }
+
+        // Check if snapshot already exists for this month
+        const snapshots = getSnapshots();
+        const existing = snapshots.find((s) => s.month === month);
+
+        if (existing) {
+          if (
+            !confirm(`A snapshot for ${month} already exists. Overwrite it?`)
+          ) {
+            return;
+          }
+          // Remove existing
+          const index = snapshots.indexOf(existing);
+          snapshots.splice(index, 1);
+        }
+
+        // Create snapshot
+        const snapshot = {
+          month: month,
+          stock: medicines.map((m) => ({
+            id: m.id,
+            name: m.name,
+            category: m.category || "Uncategorized",
+            unit: m.unit || "N/A",
+            quantity: m.quantity,
+          })),
+          savedAt: new Date().toISOString(),
+        };
+
+        snapshots.push(snapshot);
+        saveSnapshots(snapshots);
+
+        renderHistory();
+        showToast(`✅ Snapshot for ${month} saved successfully!`, "success");
+      }
+
+      // ============================================================
+      // TOAST NOTIFICATION
+      // ============================================================
+      function showToast(message, type = "success") {
+        const existing = document.querySelector(".toast-notification");
+        if (existing) existing.remove();
+
+        const colors = {
+          success: { bg: "#0a2647", icon: "#27ae60" },
+          error: { bg: "#7f1d1d", icon: "#ef4444" },
+        };
+
+        const color = colors[type] || colors.success;
+
+        const toast = document.createElement("div");
+        toast.className = "toast-notification";
+        toast.innerHTML = `
+                <i class="fas ${type === "success" ? "fa-check-circle" : "fa-exclamation-circle"}" style="color:${color.icon};"></i>
+                <span>${message}</span>
+                <button class="close-btn" onclick="this.parentElement.remove()">&times;</button>
+            `;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+          if (toast.parentElement) toast.remove();
+        }, 3000);
+      }
+
+      // ============================================================
+      // EXPOSE FUNCTIONS TO GLOBAL
+      // ============================================================
+      window.viewSnapshot = viewSnapshot;
+      window.deleteSnapshot = deleteSnapshot;
+      window.showToast = showToast;
+
+      // ============================================================
+      // EVENT LISTENERS
+      // ============================================================
+      previewBtn.addEventListener("click", renderPreview);
+
+      saveBtn.addEventListener("click", function () {
+        this.classList.add("loading");
+        this.disabled = true;
+
+        setTimeout(() => {
+          saveSnapshot();
+          this.classList.remove("loading");
+          this.disabled = false;
+        }, 500);
+      });
+
+      // ============================================================
+      // INIT
+      // ============================================================
+      setDefaultMonth();
+      renderHistory();
+
+      console.log(
+        "%c📅 MediStock Pro - Monthly Stock",
+        "font-size:20px; font-weight:bold; color:#0a2647;",
+      );
+      console.log(
+        `%c💾 ${getSnapshots().length} snapshots saved`,
+        "font-size:13px; color:#27ae60;",
+      );
+      console.log(
+        "%c📊 Save monthly starting stock snapshots.",
+        "font-size:13px; color:#64748b;",
+      );
+    </script>
+  </body>
+</html>

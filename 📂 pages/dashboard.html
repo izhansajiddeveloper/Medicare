@@ -1,0 +1,1938 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - MediStock Pro Medical Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        background: #f0f4f8;
+        overflow-x: hidden;
+        color: #0a2647;
+      }
+
+      /* ===== Sidebar ===== */
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 280px;
+        background: linear-gradient(180deg, #0a2647 0%, #1a4a7a 100%);
+        padding: 28px 20px;
+        overflow-y: auto;
+        z-index: 100;
+        transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        box-shadow: 4px 0 30px rgba(10, 38, 71, 0.15);
+      }
+
+      .sidebar::-webkit-scrollbar {
+        width: 4px;
+      }
+      .sidebar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .sidebar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 10px;
+      }
+
+      .sidebar-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-bottom: 28px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        margin-bottom: 28px;
+      }
+
+      .sidebar-brand .logo-icon {
+        width: 44px;
+        height: 44px;
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        color: #fff;
+        backdrop-filter: blur(8px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .sidebar-brand h1 {
+        color: #fff;
+        font-size: 1.25rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+      }
+
+      .sidebar-brand span {
+        color: #2d9cdb;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        display: block;
+      }
+
+      .sidebar-nav {
+        list-style: none;
+        padding: 0;
+      }
+
+      .sidebar-nav .nav-label {
+        color: rgba(255, 255, 255, 0.3);
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        padding: 14px 14px 8px;
+      }
+
+      .sidebar-nav li a {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 16px;
+        border-radius: 12px;
+        color: rgba(255, 255, 255, 0.65);
+        text-decoration: none;
+        font-size: 0.88rem;
+        font-weight: 500;
+        transition: all 0.25s ease;
+      }
+
+      .sidebar-nav li a i {
+        width: 20px;
+        font-size: 1rem;
+        text-align: center;
+        flex-shrink: 0;
+      }
+
+      .sidebar-nav li a:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .sidebar-nav li a.active {
+        color: #fff;
+        background: rgba(45, 156, 219, 0.2);
+        box-shadow: inset 3px 0 0 #2d9cdb;
+        font-weight: 600;
+      }
+
+      .sidebar-nav li a .badge {
+        margin-left: auto;
+        background: rgba(231, 76, 60, 0.25);
+        color: #ef4444;
+        padding: 2px 10px;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        font-weight: 700;
+      }
+
+      /* ===== Main Content ===== */
+      .main-content {
+        margin-left: 280px;
+        padding: 28px 32px 40px;
+        min-height: 100vh;
+        transition: margin-left 0.3s ease;
+      }
+
+      /* ===== Top Bar ===== */
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 24px;
+        border-bottom: 1px solid #e2e8f0;
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+
+      .topbar-left h2 {
+        font-size: 1.7rem;
+        font-weight: 800;
+        color: #0a2647;
+        letter-spacing: -0.5px;
+      }
+
+      .topbar-left p {
+        color: #64748b;
+        font-size: 0.9rem;
+        margin-top: 2px;
+      }
+
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .topbar-right .search-box {
+        display: flex;
+        align-items: center;
+        background: #fff;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 9px 16px;
+        gap: 10px;
+        transition: all 0.3s ease;
+        min-width: 240px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+      }
+
+      .topbar-right .search-box:focus-within {
+        border-color: #2d9cdb;
+        box-shadow: 0 0 0 4px rgba(45, 156, 219, 0.12);
+      }
+
+      .topbar-right .search-box input {
+        border: none;
+        outline: none;
+        background: transparent;
+        font-size: 0.85rem;
+        color: #0a2647;
+        width: 100%;
+        font-family: "Inter", sans-serif;
+      }
+
+      .topbar-right .user-badge {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #fff;
+        padding: 6px 14px 6px 8px;
+        border-radius: 50px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+      }
+
+      .topbar-right .user-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0a2647, #2d9cdb);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 700;
+        font-size: 0.8rem;
+      }
+
+      /* ===== Stats Cards ===== */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 28px;
+      }
+
+      .stat-card {
+        background: #fff;
+        border-radius: 18px;
+        padding: 18px 20px;
+        border: 1px solid rgba(10, 38, 71, 0.04);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        transition: all 0.3s ease;
+      }
+
+      .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 35px rgba(10, 38, 71, 0.08);
+      }
+
+      .stat-card .icon-wrapper {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+      }
+
+      .stat-card.c-blue .icon-wrapper {
+        background: rgba(45, 156, 219, 0.12);
+        color: #2d9cdb;
+      }
+      .stat-card.c-green .icon-wrapper {
+        background: rgba(39, 174, 96, 0.12);
+        color: #27ae60;
+      }
+      .stat-card.c-amber .icon-wrapper {
+        background: rgba(243, 156, 18, 0.12);
+        color: #f39c12;
+      }
+      .stat-card.c-rose .icon-wrapper {
+        background: rgba(231, 76, 60, 0.12);
+        color: #e74c3c;
+      }
+      .stat-card.c-purple .icon-wrapper {
+        background: rgba(155, 89, 182, 0.12);
+        color: #8e44ad;
+      }
+      .stat-card.c-teal .icon-wrapper {
+        background: rgba(26, 188, 156, 0.12);
+        color: #1abc9c;
+      }
+      .stat-card.c-orange .icon-wrapper {
+        background: rgba(230, 126, 34, 0.12);
+        color: #e67e22;
+      }
+      .stat-card.c-indigo .icon-wrapper {
+        background: rgba(63, 81, 181, 0.12);
+        color: #3f51b5;
+      }
+
+      .stat-card .stat-val {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #0a2647;
+        line-height: 1.2;
+      }
+
+      .stat-card .stat-title {
+        font-size: 0.75rem;
+        color: #64748b;
+        font-weight: 500;
+      }
+
+      .stat-card .stat-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.65rem;
+        font-weight: 700;
+        padding: 2px 10px;
+        border-radius: 50px;
+        margin-top: 6px;
+      }
+
+      .stat-card .stat-badge.badge-up {
+        background: #dcfce7;
+        color: #15803d;
+      }
+      .stat-card .stat-badge.badge-warn {
+        background: #fef3c7;
+        color: #b45309;
+      }
+      .stat-card .stat-badge.badge-danger {
+        background: #ffe4e6;
+        color: #be123c;
+      }
+      .stat-card .stat-badge.badge-info {
+        background: #e0f2fe;
+        color: #0369a1;
+      }
+
+      /* ===== Charts Grid ===== */
+      .charts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+        gap: 24px;
+        margin-bottom: 28px;
+      }
+
+      .chart-card {
+        background: #fff;
+        border-radius: 20px;
+        border: 1px solid rgba(10, 38, 71, 0.04);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        padding: 22px 24px 20px;
+        transition: all 0.3s ease;
+      }
+
+      .chart-card:hover {
+        box-shadow: 0 8px 30px rgba(10, 38, 71, 0.06);
+      }
+
+      .chart-card .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 14px;
+      }
+
+      .chart-card .card-header h3 {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #0a2647;
+      }
+
+      .chart-card .card-header .badge-count {
+        font-size: 0.65rem;
+        font-weight: 600;
+        padding: 4px 14px;
+        border-radius: 50px;
+        background: #f1f5f9;
+        color: #64748b;
+      }
+
+      .chart-card .chart-container {
+        position: relative;
+        height: 200px;
+      }
+
+      .chart-card .chart-container.pie-chart {
+        height: 200px;
+        max-width: 260px;
+        margin: 0 auto;
+      }
+
+      /* ===== Content Tables ===== */
+      .content-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 24px;
+        margin-bottom: 28px;
+      }
+
+      .card-panel {
+        background: #fff;
+        border-radius: 20px;
+        padding: 22px 24px;
+        border: 1px solid rgba(10, 38, 71, 0.04);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+      }
+
+      .card-panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+      }
+
+      .card-panel-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #0a2647;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .custom-table-wrapper {
+        overflow-x: auto;
+        border-radius: 12px;
+        border: 1px solid #f1f5f9;
+      }
+
+      table.custom-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+        font-size: 0.82rem;
+      }
+
+      table.custom-table thead {
+        background: #f8fafc;
+        border-bottom: 1.5px solid #e2e8f0;
+      }
+
+      table.custom-table th {
+        padding: 12px 16px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      table.custom-table td {
+        padding: 12px 16px;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+        color: #0a2647;
+      }
+
+      table.custom-table tr:last-child td {
+        border-bottom: none;
+      }
+
+      table.custom-table tr:hover {
+        background: #f8fafc;
+      }
+
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 12px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.7rem;
+      }
+
+      .status-pill.instock {
+        background: #dcfce7;
+        color: #15803d;
+      }
+      .status-pill.lowstock {
+        background: #fef3c7;
+        color: #b45309;
+      }
+      .status-pill.outstock {
+        background: #ffe4e6;
+        color: #be123c;
+      }
+
+      /* ===== Quick Actions ===== */
+      /* CHANGE #2: Reduced width to fit 2 in one line */
+      .quick-actions-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+
+      .quick-action-btn {
+        padding: 16px 12px;
+        border-radius: 16px;
+        border: 1px solid rgba(10, 38, 71, 0.04);
+        background: #fff;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        width: 100%;
+      }
+
+      .quick-action-btn:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(10, 38, 71, 0.08);
+      }
+
+      .quick-action-btn .icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        color: #fff;
+      }
+
+      .quick-action-btn .icon.blue {
+        background: #2d9cdb;
+      }
+      .quick-action-btn .icon.green {
+        background: #27ae60;
+      }
+      .quick-action-btn .icon.amber {
+        background: #f39c12;
+      }
+      .quick-action-btn .icon.purple {
+        background: #8e44ad;
+      }
+      .quick-action-btn .icon.indigo {
+        background: #3f51b5;
+      }
+      .quick-action-btn .icon.slate {
+        background: #64748b;
+      }
+
+      .quick-action-btn .label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #0a2647;
+      }
+
+      /* ===== Toast ===== */
+      .toast-notification {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: #0a2647;
+        color: #fff;
+        padding: 14px 24px;
+        border-radius: 14px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        box-shadow: 0 8px 30px rgba(10, 38, 71, 0.2);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        animation: slideIn 0.4s ease;
+        max-width: 400px;
+      }
+
+      .toast-notification .close-btn {
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+        font-size: 1.2rem;
+        margin-left: 8px;
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      /* ===== Category Breakdown ===== */
+      .category-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .category-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 10px;
+        background: #f8fafc;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+      }
+
+      .category-item:hover {
+        background: #f1f5f9;
+      }
+
+      .category-item .color-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+
+      .category-item .cat-name {
+        flex: 1;
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: #0a2647;
+      }
+
+      .category-item .cat-count {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #0a2647;
+      }
+
+      .category-item .cat-bar {
+        width: 50px;
+        height: 5px;
+        background: #e2e8f0;
+        border-radius: 50px;
+        overflow: hidden;
+      }
+
+      .category-item .cat-bar .fill {
+        height: 100%;
+        border-radius: 50px;
+        transition: width 0.6s ease;
+      }
+
+      /* ===== Mobile ===== */
+      .sidebar-toggle {
+        display: none;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #0a2647;
+        cursor: pointer;
+      }
+
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(10, 38, 71, 0.3);
+        backdrop-filter: blur(4px);
+        z-index: 99;
+      }
+
+      @media (max-width: 1024px) {
+        .charts-grid {
+          grid-template-columns: 1fr;
+        }
+        .content-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .sidebar {
+          transform: translateX(-100%);
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .sidebar-overlay.open {
+          display: block;
+        }
+        .sidebar-toggle {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 8px;
+        }
+        .main-content {
+          margin-left: 0;
+          padding: 16px;
+        }
+        .topbar {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 14px;
+        }
+        .stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 12px;
+        }
+        .stat-card {
+          padding: 14px 16px;
+        }
+        .stat-card .stat-val {
+          font-size: 1.2rem;
+        }
+        .quick-actions-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (max-width: 480px) {
+        .stats-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .quick-actions-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .chart-card .chart-container {
+          height: 160px;
+        }
+        .chart-card .chart-container.pie-chart {
+          height: 160px;
+          max-width: 200px;
+        }
+        .content-grid {
+          gap: 16px;
+        }
+        .card-panel {
+          padding: 16px;
+        }
+      }
+
+      @media (max-width: 360px) {
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+        .quick-actions-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="logo-icon"><i class="fas fa-capsules"></i></div>
+        <div>
+          <h1>MediStock</h1>
+          <span>Pro System</span>
+        </div>
+      </div>
+
+      <ul class="sidebar-nav">
+        <li class="nav-label">Main Menu</li>
+        <li>
+          <a href="dashboard.html" class="active"
+            ><i class="fas fa-th-large"></i> Dashboard</a
+          >
+        </li>
+        <li>
+          <a href="medicines.html"><i class="fas fa-pills"></i> Medicines</a>
+        </li>
+        <li>
+          <a href="stock.html"
+            ><i class="fas fa-boxes-stacked"></i> Stock Control</a
+          >
+        </li>
+        <li>
+          <a href="search.html"
+            ><i class="fas fa-search"></i> Search Inventory</a
+          >
+        </li>
+
+        <li class="nav-label">Reports & Analytics</li>
+        <li>
+          <a href="monthly-stock.html"
+            ><i class="fas fa-calendar-alt"></i> Monthly Stock</a
+          >
+        </li>
+        <li>
+          <a href="stock-comparison.html"
+            ><i class="fas fa-balance-scale"></i> Stock Comparison</a
+          >
+        </li>
+        <li>
+          <a href="missing-medicines.html"
+            ><i class="fas fa-exclamation-triangle"></i> Missing Stock
+            <span class="badge">3</span></a
+          >
+        </li>
+        <li>
+          <a href="reports.html"
+            ><i class="fas fa-chart-pie"></i> Sales Reports</a
+          >
+        </li>
+        <li>
+          <a href="stock-history.html"
+            ><i class="fas fa-history"></i> Stock History</a
+          >
+        </li>
+
+        <li class="nav-label">System Control</li>
+        <li>
+          <a href="backup.html"
+            ><i class="fas fa-database"></i> Backup System</a
+          >
+        </li>
+        <li>
+          <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+        </li>
+        <li>
+          <a href="#" id="sidebarLogout"
+            ><i class="fas fa-sign-out-alt"></i> Logout</a
+          >
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="topbar-left flex items-center gap-3">
+          <button
+            class="sidebar-toggle text-xl text-[#0a2647] p-2.5 hover:bg-gray-200/60 rounded-xl transition border border-gray-200"
+            id="sidebarToggle"
+          >
+            <i class="fas fa-bars"></i>
+          </button>
+          <div>
+            <h2 class="text-xl sm:text-2xl font-extrabold text-[#0a2647]">
+              Store Analytics Dashboard
+            </h2>
+            <p class="text-xs sm:text-sm text-gray-500">
+              Real-time overview of pharmacy inventory, stock alerts, and
+              valuation
+            </p>
+          </div>
+        </div>
+        <div
+          class="topbar-right flex flex-wrap items-center justify-between sm:justify-end gap-3 w-full sm:w-auto"
+        >
+          <div class="search-box flex-1 sm:flex-initial">
+            <i class="fas fa-search text-gray-400"></i>
+            <input
+              type="text"
+              id="globalSearch"
+              placeholder="Search medicine stock..."
+            />
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="user-badge">
+              <div class="user-avatar" id="userAvatar">AD</div>
+              <span class="text-xs font-bold text-[#0a2647]" id="userName"
+                >Admin</span
+              >
+            </div>
+            <button
+              id="topLogoutBtn"
+              class="px-3.5 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition flex items-center gap-1.5 border border-red-200"
+            >
+              <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Welcome Hero Banner -->
+      <div
+        class="bg-gradient-to-r from-[#0a2647] via-[#1a4a7a] to-[#2d9cdb] rounded-3xl p-5 sm:p-8 text-white mb-8 shadow-xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6"
+      >
+        <div class="relative z-10">
+          <span
+            class="px-3.5 py-1 bg-white/10 rounded-full text-xs font-semibold tracking-wide text-blue-200 border border-white/10"
+          >
+            <i class="fas fa-shield-check mr-1.5 text-emerald-400"></i> Store
+            Operational
+          </span>
+          <h1
+            class="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight mt-2.5"
+          >
+            Welcome to MediStock Control Center
+          </h1>
+          <p class="text-white/80 text-xs sm:text-sm mt-1 max-w-xl">
+            Monitor live stock counts, low inventory reorder warnings, and
+            inventory valuation at a glance.
+          </p>
+        </div>
+        <div
+          class="relative z-10 flex flex-col sm:flex-row items-stretch sm:items-center gap-3"
+        >
+          <a
+            href="add-medicine.html"
+            class="px-4 sm:px-5 py-3 bg-[#27ae60] hover:bg-[#219653] text-white rounded-xl text-xs sm:text-sm font-bold shadow-lg transition flex items-center justify-center gap-2"
+          >
+            <i class="fas fa-plus"></i> Add New Medicine
+          </a>
+          <a
+            href="medicines.html"
+            class="px-4 sm:px-5 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs sm:text-sm font-bold border border-white/20 transition backdrop-blur-md flex items-center justify-center gap-2"
+          >
+            <i class="fas fa-list-check"></i> Manage Inventory
+          </a>
+        </div>
+      </div>
+
+      <!-- 8 Real Stats Cards -->
+      <section class="stats-grid" id="statsGrid">
+        <!-- Injected by JS -->
+      </section>
+
+      <!-- Charts Grid -->
+      <section class="charts-grid">
+        <!-- Pie Chart -->
+        <div class="chart-card">
+          <div class="card-header">
+            <h3>
+              <i class="fas fa-chart-pie text-[#2d9cdb] mr-2"></i> Stock
+              Distribution
+            </h3>
+            <span class="badge-count" id="pieTotal">0 items</span>
+          </div>
+          <div class="chart-container pie-chart">
+            <canvas id="pieChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Bar Chart -->
+        <div class="chart-card">
+          <div class="card-header">
+            <h3>
+              <i class="fas fa-chart-bar text-[#27ae60] mr-2"></i> Stock by
+              Category
+            </h3>
+            <span class="badge-count" id="barTotal">0 categories</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="barChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Line Chart (Monthly Trends) -->
+        <!-- CHANGE #1: Replaced standard line chart content with requested custom chart -->
+        <div class="chart-card">
+          <div class="card-header">
+            <h3>
+              <i class="fas fa-chart-line text-[#8e44ad] mr-2"></i> Monthly
+              Stock Trend
+            </h3>
+            <span class="badge-count" id="lineTotal">Last 6 months</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="businessGrowthChart"></canvas>
+          </div>
+          <p
+            style="
+              text-align: center;
+              font-weight: bold;
+              color: #8da6bd;
+              letter-spacing: 2px;
+              margin-top: 10px;
+            "
+          >
+            BUSINESS GROWTH
+          </p>
+        </div>
+
+        <!-- Doughnut Chart (Stock Health) -->
+        <div class="chart-card">
+          <div class="card-header">
+            <h3>
+              <i class="fas fa-circle text-[#f39c12] mr-2"></i> Stock Health
+            </h3>
+            <span class="badge-count" id="doughnutTotal">0 items</span>
+          </div>
+          <div class="chart-container pie-chart">
+            <canvas id="doughnutChart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- CONTENT TABLES ROW -->
+      <!-- ============================================================ -->
+      <div class="content-grid">
+        <!-- Recent Medicines Table -->
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <div class="card-panel-title">
+              <i class="fas fa-boxes-stacked text-[#2d9cdb]"></i> Recent
+              Medicine Inventory
+            </div>
+            <a
+              href="medicines.html"
+              class="text-xs font-bold text-[#2d9cdb] hover:underline"
+            >
+              View Full Directory →
+            </a>
+          </div>
+
+          <div class="custom-table-wrapper">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Medicine & Batch</th>
+                  <th>Category</th>
+                  <th>Quantity</th>
+                  <th>Unit Price</th>
+                  <th>Status</th>
+                  <th class="text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody id="recentMedsTbody">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Category Breakdown -->
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <div class="card-panel-title">
+              <i class="fas fa-chart-pie text-[#8e44ad]"></i> Category Breakdown
+            </div>
+          </div>
+
+          <div id="categoryBreakdownList" class="category-list">
+            <!-- Injected via JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- CRITICAL WARNINGS TABLE -->
+      <!-- ============================================================ -->
+      <div class="content-grid" style="margin-bottom: 28px">
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <div class="card-panel-title">
+              <i class="fas fa-bell text-[#e74c3c]"></i> Low Stock & Expiry
+              Alerts
+            </div>
+            <span
+              class="text-xs font-semibold px-2.5 py-1 bg-red-50 text-red-700 rounded-full border border-red-200"
+            >
+              Needs Attention
+            </span>
+          </div>
+
+          <div class="custom-table-wrapper">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Item Name</th>
+                  <th>Current Stock</th>
+                  <th>Expiry Date</th>
+                  <th>Alert Type</th>
+                  <th class="text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody id="alertsTbody">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card-panel">
+          <div class="card-panel-header">
+            <div class="card-panel-title">
+              <i class="fas fa-bolt text-[#f39c12]"></i> Operational Shortcuts
+            </div>
+          </div>
+
+          <div class="quick-actions-grid">
+            <a href="add-medicine.html" class="quick-action-btn">
+              <div class="icon blue"><i class="fas fa-plus"></i></div>
+              <span class="label">Add Medicine</span>
+            </a>
+            <a href="stock.html" class="quick-action-btn">
+              <div class="icon green"><i class="fas fa-boxes-packing"></i></div>
+              <span class="label">Stock Control</span>
+            </a>
+            <a href="monthly-stock.html" class="quick-action-btn">
+              <div class="icon amber"><i class="fas fa-calendar-alt"></i></div>
+              <span class="label">Monthly View</span>
+            </a>
+            <a href="reports.html" class="quick-action-btn">
+              <div class="icon purple"><i class="fas fa-chart-line"></i></div>
+              <span class="label">Reports</span>
+            </a>
+            <a href="backup.html" class="quick-action-btn">
+              <div class="icon indigo"><i class="fas fa-database"></i></div>
+              <span class="label">Backup</span>
+            </a>
+            <a href="settings.html" class="quick-action-btn">
+              <div class="icon slate"><i class="fas fa-cog"></i></div>
+              <span class="label">Settings</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ============================================================ -->
+    <!-- JAVASCRIPT -->
+    <!-- ============================================================ -->
+    <script>
+      // ============================================================
+      // CHECK LOGIN
+      // ============================================================
+      if (localStorage.getItem("isLoggedIn") !== "true") {
+        window.location.href = "login.html";
+      }
+
+      // User details & Logout
+      const userEmail =
+        localStorage.getItem("userEmail") || "admin@medistock.com";
+      const namePart = userEmail.split("@")[0];
+      document.getElementById("userName").textContent = namePart;
+      document.getElementById("userAvatar").textContent = namePart
+        .substring(0, 2)
+        .toUpperCase();
+
+      function performLogout(e) {
+        if (e) e.preventDefault();
+        localStorage.removeItem("isLoggedIn");
+        localStorage.removeItem("userEmail");
+        window.location.href = "login.html";
+      }
+
+      document
+        .getElementById("topLogoutBtn")
+        .addEventListener("click", performLogout);
+      document
+        .getElementById("sidebarLogout")
+        .addEventListener("click", performLogout);
+
+      // ============================================================
+      // SIDEBAR
+      // ============================================================
+      const sidebar = document.getElementById("sidebar");
+      const sidebarOverlay = document.getElementById("sidebarOverlay");
+      const sidebarToggle = document.getElementById("sidebarToggle");
+
+      function toggleSidebar() {
+        sidebar.classList.toggle("open");
+        sidebarOverlay.classList.toggle("open");
+      }
+
+      sidebarToggle.addEventListener("click", toggleSidebar);
+      sidebarOverlay.addEventListener("click", toggleSidebar);
+
+      document.querySelectorAll(".sidebar-nav a").forEach((link) => {
+        link.addEventListener("click", () => {
+          if (window.innerWidth <= 768) {
+            sidebar.classList.remove("open");
+            sidebarOverlay.classList.remove("open");
+          }
+        });
+      });
+
+      // ============================================================
+      // HELPERS
+      // ============================================================
+      function getMedicines() {
+        const stored = localStorage.getItem("medicines");
+        if (stored) {
+          try {
+            return JSON.parse(stored);
+          } catch (e) {
+            return [];
+          }
+        }
+        return [];
+      }
+
+      function getSnapshots() {
+        const stored = localStorage.getItem("monthlySnapshots");
+        if (stored) {
+          try {
+            return JSON.parse(stored);
+          } catch (e) {
+            return [];
+          }
+        }
+        return [];
+      }
+
+      function showToast(message, type = "success") {
+        const existing = document.querySelector(".toast-notification");
+        if (existing) existing.remove();
+
+        const colors = {
+          success: { bg: "#0a2647", icon: "#27ae60" },
+          error: { bg: "#7f1d1d", icon: "#ef4444" },
+        };
+
+        const color = colors[type] || colors.success;
+
+        const toast = document.createElement("div");
+        toast.className = "toast-notification";
+        toast.innerHTML = `
+                        <i class="fas ${type === "success" ? "fa-check-circle" : "fa-exclamation-circle"}" style="color:${color.icon};"></i>
+                        <span>${message}</span>
+                        <button class="close-btn" onclick="this.parentElement.remove()">&times;</button>
+                    `;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+          if (toast.parentElement) toast.remove();
+        }, 3000);
+      }
+
+      // ============================================================
+      // COLORS
+      // ============================================================
+      const chartColors = [
+        "#2d9cdb",
+        "#27ae60",
+        "#f39c12",
+        "#e74c3c",
+        "#8e44ad",
+        "#1abc9c",
+        "#e67e22",
+        "#3498db",
+        "#2ecc71",
+        "#9b59b6",
+        "#1a4a7a",
+        "#d35400",
+        "#16a085",
+        "#c0392b",
+        "#2980b9",
+      ];
+
+      // ============================================================
+      // CHART INSTANCES
+      // ============================================================
+      let pieChartInstance = null;
+      let barChartInstance = null;
+      let lineChartInstance = null;
+      let doughnutChartInstance = null;
+
+      // ============================================================
+      // GENERATE MONTHLY DATA
+      // ============================================================
+      function generateMonthlyData() {
+        const snapshots = getSnapshots();
+
+        // If we have real snapshots, use them
+        if (snapshots.length > 0) {
+          const sorted = [...snapshots].sort((a, b) =>
+            a.month.localeCompare(b.month),
+          );
+          const last6 = sorted.slice(-6);
+
+          const months = last6.map((s) => {
+            const d = new Date(s.month + "-01");
+            return d.toLocaleString("default", {
+              month: "short",
+              year: "2-digit",
+            });
+          });
+
+          const totals = last6.map((s) => {
+            return s.stock.reduce((sum, item) => sum + (item.quantity || 0), 0);
+          });
+
+          return { months, totals };
+        }
+
+        // Generate sample data based on current medicines
+        const medicines = getMedicines();
+        const currentTotal = medicines.reduce(
+          (sum, m) => sum + (m.quantity || 0),
+          0,
+        );
+
+        // Generate 6 months of sample data ending with current total
+        const months = [];
+        const totals = [];
+        const now = new Date();
+
+        for (let i = 5; i >= 0; i--) {
+          const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+          months.push(
+            d.toLocaleString("default", { month: "short", year: "2-digit" }),
+          );
+
+          // Generate realistic data with some variation
+          const variation = 1 + (Math.random() * 0.2 - 0.1);
+          const baseValue = Math.max(100, currentTotal * (0.7 + (i / 5) * 0.3));
+          totals.push(Math.round(baseValue * variation));
+        }
+
+        // Make sure the last month matches current total closely
+        totals[totals.length - 1] = Math.round(
+          currentTotal * (0.95 + Math.random() * 0.1),
+        );
+
+        return { months, totals };
+      }
+
+      // ============================================================
+      // RENDER DASHBOARD
+      // ============================================================
+      function renderDashboard() {
+        const medicines = getMedicines();
+        const snapshots = getSnapshots();
+
+        // Calculate stats
+        const total = medicines.length;
+        const inStock = medicines.filter((m) => m.quantity > 10).length;
+        const low = medicines.filter(
+          (m) => m.quantity > 0 && m.quantity <= 10,
+        ).length;
+        const out = medicines.filter((m) => m.quantity === 0).length;
+        const totalQty = medicines.reduce(
+          (sum, m) => sum + (m.quantity || 0),
+          0,
+        );
+        const totalValue = medicines.reduce(
+          (sum, m) => sum + (m.quantity || 0) * (m.price || 0),
+          0,
+        );
+
+        // Expiring soon (30 days)
+        const today = new Date();
+        const thirtyDaysFromNow = new Date();
+        thirtyDaysFromNow.setDate(today.getDate() + 30);
+        const expiringSoon = medicines.filter((m) => {
+          if (!m.expiry) return false;
+          const exp = new Date(m.expiry);
+          return exp >= today && exp <= thirtyDaysFromNow;
+        }).length;
+
+        // Categories
+        const categories = [
+          ...new Set(medicines.map((m) => m.category || "Uncategorized")),
+        ];
+
+        // Render Stats
+        const statsGrid = document.getElementById("statsGrid");
+        const stats = [
+          {
+            icon: "fa-pills",
+            iconClass: "c-blue",
+            number: total,
+            label: "Total Medicines",
+            badge: "Live Database",
+            badgeClass: "badge-info",
+          },
+          {
+            icon: "fa-circle-check",
+            iconClass: "c-green",
+            number: inStock,
+            label: "In Stock Items",
+            badge: "Healthy Level",
+            badgeClass: "badge-up",
+          },
+          {
+            icon: "fa-triangle-exclamation",
+            iconClass: "c-amber",
+            number: low,
+            label: "Low Stock Reorders",
+            badge: "Action Needed",
+            badgeClass: "badge-warn",
+          },
+          {
+            icon: "fa-circle-xmark",
+            iconClass: "c-rose",
+            number: out,
+            label: "Out of Stock",
+            badge: "Urgent Stock Out",
+            badgeClass: "badge-danger",
+          },
+          {
+            icon: "fa-sack-dollar",
+            iconClass: "c-purple",
+            number: "$" + totalValue.toFixed(2),
+            label: "Total Inventory Value",
+            badge: "Asset Value",
+            badgeClass: "badge-up",
+          },
+          {
+            icon: "fa-clock-rotate-left",
+            iconClass: "c-orange",
+            number: expiringSoon,
+            label: "Expiring Soon (30 Days)",
+            badge: "Check Batches",
+            badgeClass: "badge-warn",
+          },
+          {
+            icon: "fa-cart-flatbed",
+            iconClass: "c-teal",
+            number: "$" + (low * 20 * 10).toFixed(2),
+            label: "Est. Reorder Cost",
+            badge: "Restock Budget",
+            badgeClass: "badge-info",
+          },
+          {
+            icon: "fa-layer-group",
+            iconClass: "c-indigo",
+            number: categories.length,
+            label: "Active Categories",
+            badge: "Classification",
+            badgeClass: "badge-info",
+          },
+        ];
+
+        statsGrid.innerHTML = stats
+          .map(
+            (s) => `
+                        <div class="stat-card ${s.iconClass}">
+                            <div class="icon-wrapper"><i class="fas ${s.icon}"></i></div>
+                            <div class="stat-val">${s.number}</div>
+                            <div class="stat-title">${s.label}</div>
+                            <div class="stat-badge ${s.badgeClass}"><i class="fas fa-circle"></i> ${s.badge}</div>
+                        </div>
+                    `,
+          )
+          .join("");
+
+        // Category data for charts
+        const categoryMap = {};
+        medicines.forEach((m) => {
+          const cat = m.category || "Uncategorized";
+          categoryMap[cat] = (categoryMap[cat] || 0) + 1;
+        });
+        const catLabels = Object.keys(categoryMap);
+        const catData = catLabels.map((c) => categoryMap[c]);
+
+        // Update badges
+        document.getElementById("pieTotal").textContent = total + " items";
+        document.getElementById("barTotal").textContent =
+          catLabels.length + " categories";
+        document.getElementById("doughnutTotal").textContent = total + " items";
+
+        // Render Charts
+        renderPieChart(catLabels, catData, total);
+        renderBarChart(catLabels, catData);
+        renderCustomLineChart(); // CHANGE #1: Renders the custom blue chart
+        renderDoughnutChart(inStock, low, out);
+
+        // Render Tables
+        renderRecentMedicines(medicines);
+        renderCategoryBreakdown(categoryMap, total);
+        renderAlerts(medicines, thirtyDaysFromNow);
+      }
+
+      // ============================================================
+      // PIE CHART
+      // ============================================================
+      function renderPieChart(labels, data, total) {
+        const ctx = document.getElementById("pieChart").getContext("2d");
+
+        if (pieChartInstance) pieChartInstance.destroy();
+
+        if (total === 0) {
+          pieChartInstance = new Chart(ctx, {
+            type: "doughnut",
+            data: {
+              labels: ["No Data"],
+              datasets: [
+                { data: [1], backgroundColor: ["#e2e8f0"], borderWidth: 0 },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+            },
+          });
+          return;
+        }
+
+        let displayLabels = [...labels];
+        let displayData = [...data];
+
+        if (labels.length > 6) {
+          const sorted = labels
+            .map((l, i) => ({ label: l, value: data[i] }))
+            .sort((a, b) => b.value - a.value);
+          const top6 = sorted.slice(0, 6);
+          const otherSum = sorted
+            .slice(6)
+            .reduce((sum, item) => sum + item.value, 0);
+          displayLabels = top6.map((item) => item.label);
+          displayData = top6.map((item) => item.value);
+          if (otherSum > 0) {
+            displayLabels.push("Others");
+            displayData.push(otherSum);
+          }
+        }
+
+        const usedColors = displayLabels.map(
+          (_, i) => chartColors[i % chartColors.length],
+        );
+
+        pieChartInstance = new Chart(ctx, {
+          type: "doughnut",
+          data: {
+            labels: displayLabels,
+            datasets: [
+              {
+                data: displayData,
+                backgroundColor: usedColors,
+                borderWidth: 2,
+                borderColor: "#fff",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: "55%",
+            plugins: {
+              legend: {
+                position: "bottom",
+                labels: {
+                  padding: 10,
+                  usePointStyle: true,
+                  pointStyle: "circle",
+                  font: { size: 10, family: "Inter" },
+                  color: "#0a2647",
+                },
+              },
+            },
+            animation: { animateRotate: true, duration: 1000 },
+          },
+        });
+      }
+
+      // ============================================================
+      // BAR CHART
+      // ============================================================
+      function renderBarChart(labels, data) {
+        const ctx = document.getElementById("barChart").getContext("2d");
+
+        if (barChartInstance) barChartInstance.destroy();
+
+        if (labels.length === 0) {
+          barChartInstance = new Chart(ctx, {
+            type: "bar",
+            data: {
+              labels: ["No Data"],
+              datasets: [
+                {
+                  label: "Items",
+                  data: [0],
+                  backgroundColor: ["#e2e8f0"],
+                  borderRadius: 6,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
+            },
+          });
+          return;
+        }
+
+        const usedColors = labels.map(
+          (_, i) => chartColors[i % chartColors.length],
+        );
+
+        barChartInstance = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: "Medicines",
+                data: data,
+                backgroundColor: usedColors,
+                borderRadius: 6,
+                borderSkipped: false,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: { stepSize: 1, font: { size: 10 } },
+                grid: { color: "#f1f5f9" },
+              },
+              x: {
+                grid: { display: false },
+                ticks: { font: { size: 10 }, maxRotation: 45, minRotation: 30 },
+              },
+            },
+            animation: { duration: 800 },
+          },
+        });
+      }
+
+      // ============================================================
+      // LINE CHART (MONTHLY TREND) - REPLACED WITH CUSTOM CHART
+      // ============================================================
+      function renderCustomLineChart() {
+        const ctx = document
+          .getElementById("businessGrowthChart")
+          .getContext("2d");
+
+        if (lineChartInstance) lineChartInstance.destroy();
+
+        // Data mimicking the image pattern
+        const labels = ["1", "2", "3", "4", "5", "6", "7"];
+        const data = [20, 45, 30, 55, 40, 65, 90];
+
+        lineChartInstance = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: "Growth",
+                data: data,
+                borderColor: "#2563eb",
+                borderWidth: 4,
+                pointRadius: 0,
+                tension: 0.1,
+                fill: false,
+              },
+              {
+                // Faint background bars
+                type: "bar",
+                label: "Background",
+                data: [15, 40, 25, 50, 35, 60, 85],
+                backgroundColor: "rgba(200, 220, 240, 0.3)",
+                barPercentage: 0.5,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: { enabled: false },
+            },
+            scales: {
+              x: { display: false },
+              y: { display: false },
+            },
+            plugins: [
+              {
+                id: "arrowPlugin",
+                afterDatasetsDraw: function (chart) {
+                  const ctx = chart.ctx;
+                  const meta = chart.getDatasetMeta(0);
+                  const lastPoint = meta.data[meta.data.length - 1];
+                  ctx.save();
+                  ctx.fillStyle = "#2563eb";
+                  ctx.beginPath();
+                  // Draw arrow head
+                  ctx.moveTo(lastPoint.x + 20, lastPoint.y - 20);
+                  ctx.lineTo(lastPoint.x + 30, lastPoint.y - 10);
+                  ctx.lineTo(lastPoint.x + 10, lastPoint.y - 5);
+                  ctx.fill();
+                  ctx.restore();
+                },
+              },
+            ],
+          },
+        });
+      }
+
+      // ============================================================
+      // DOUGHNUT CHART (Stock Health)
+      // ============================================================
+      function renderDoughnutChart(inStock, low, out) {
+        const ctx = document.getElementById("doughnutChart").getContext("2d");
+
+        if (doughnutChartInstance) doughnutChartInstance.destroy();
+
+        const total = inStock + low + out;
+
+        if (total === 0) {
+          doughnutChartInstance = new Chart(ctx, {
+            type: "doughnut",
+            data: {
+              labels: ["No Data"],
+              datasets: [
+                { data: [1], backgroundColor: ["#e2e8f0"], borderWidth: 0 },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+            },
+          });
+          return;
+        }
+
+        doughnutChartInstance = new Chart(ctx, {
+          type: "doughnut",
+          data: {
+            labels: ["In Stock (>10)", "Low Stock (1-10)", "Out of Stock (0)"],
+            datasets: [
+              {
+                data: [inStock, low, out],
+                backgroundColor: ["#27ae60", "#f39c12", "#e74c3c"],
+                borderWidth: 2,
+                borderColor: "#fff",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: "60%",
+            plugins: {
+              legend: {
+                position: "bottom",
+                labels: {
+                  padding: 10,
+                  usePointStyle: true,
+                  pointStyle: "circle",
+                  font: { size: 10, family: "Inter" },
+                  color: "#0a2647",
+                },
+              },
+            },
+            animation: { animateRotate: true, duration: 1000 },
+          },
+        });
+      }
+
+      // ============================================================
+      // RECENT MEDICINES TABLE
+      // ============================================================
+      function renderRecentMedicines(medicines) {
+        const tbody = document.getElementById("recentMedsTbody");
+        const recent = [...medicines].reverse().slice(0, 5);
+
+        if (recent.length === 0) {
+          tbody.innerHTML = `
+                            <tr>
+                                <td colspan="6" class="text-center py-6 text-gray-500">
+                                    <i class="fas fa-inbox text-2xl block mb-2"></i>
+                                    No medicines found
+                                </td>
+                            </tr>
+                        `;
+          return;
+        }
+
+        tbody.innerHTML = recent
+          .map((m) => {
+            const qty = Number(m.quantity) || 0;
+            let badgeHtml = `<span class="status-pill instock"><i class="fas fa-check"></i> In Stock</span>`;
+            if (qty === 0) {
+              badgeHtml = `<span class="status-pill outstock"><i class="fas fa-xmark"></i> Out of Stock</span>`;
+            } else if (qty <= 10) {
+              badgeHtml = `<span class="status-pill lowstock"><i class="fas fa-exclamation"></i> Low Stock</span>`;
+            }
+
+            return `
+                            <tr>
+                                <td>
+                                    <div class="font-bold text-[#0a2647]">${m.name}</div>
+                                    <div class="text-[11px] text-gray-400 font-mono">${m.batch || "BAT-2026-GEN"}</div>
+                                </td>
+                                <td><span class="text-xs font-semibold text-gray-600 px-2.5 py-1 bg-gray-100 rounded-lg">${m.category || "General"}</span></td>
+                                <td class="font-bold">${qty} ${m.unit || "pcs"}</td>
+                                <td class="font-semibold text-gray-700">$${(Number(m.price) || 0).toFixed(2)}</td>
+                                <td>${badgeHtml}</td>
+                                <td class="text-center">
+                                    <a href="medicines.html" class="px-3 py-1 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-bold transition">
+                                        Manage
+                                    </a>
+                                </td>
+                            </tr>
+                        `;
+          })
+          .join("");
+      }
+
+      // ============================================================
+      // CATEGORY BREAKDOWN
+      // ============================================================
+      function renderCategoryBreakdown(categoryMap, total) {
+        const container = document.getElementById("categoryBreakdownList");
+        const entries = Object.entries(categoryMap).sort((a, b) => b[1] - a[1]);
+
+        if (entries.length === 0) {
+          container.innerHTML = `
+                            <div style="text-align:center;padding:20px;color:#94a3b8;">
+                                <i class="fas fa-inbox text-2xl mb-2 block"></i>
+                                No categories found
+                            </div>
+                        `;
+          return;
+        }
+
+        container.innerHTML = entries
+          .map(([cat, count], idx) => {
+            const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+            const color = chartColors[idx % chartColors.length];
+
+            return `
+                            <div class="category-item">
+                                <span class="color-dot" style="background:${color};"></span>
+                                <span class="cat-name">${cat}</span>
+                                <span class="cat-count">${count}</span>
+                                <div class="cat-bar">
+                                    <div class="fill" style="width:${pct}%;background:${color};"></div>
+                                </div>
+                                <span style="font-size:0.65rem;color:#94a3b8;min-width:36px;text-align:right;">${pct}%</span>
+                            </div>
+                        `;
+          })
+          .join("");
+      }
+
+      // ============================================================
+      // ALERTS TABLE
+      // ============================================================
+      function renderAlerts(medicines, thirtyDaysFromNow) {
+        const tbody = document.getElementById("alertsTbody");
+
+        const critical = medicines
+          .filter((m) => {
+            const qty = Number(m.quantity) || 0;
+            if (qty <= 10) return true;
+            if (m.expiry) {
+              const exp = new Date(m.expiry);
+              return exp <= thirtyDaysFromNow;
+            }
+            return false;
+          })
+          .slice(0, 5);
+
+        if (critical.length === 0) {
+          tbody.innerHTML = `
+                            <tr>
+                                <td colspan="5" class="text-center py-6 text-emerald-600 font-semibold">
+                                    <i class="fas fa-check-circle mr-1"></i> No critical low stock or expiry warnings!
+                                </td>
+                            </tr>
+                        `;
+          return;
+        }
+
+        tbody.innerHTML = critical
+          .map((m) => {
+            const qty = Number(m.quantity) || 0;
+            let alertType = `<span class="text-xs font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200">Low Inventory (${qty})</span>`;
+            if (qty === 0) {
+              alertType = `<span class="text-xs font-bold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-full border border-rose-200">Out of Stock</span>`;
+            }
+
+            return `
+                            <tr>
+                                <td class="font-bold text-[#0a2647]">${m.name}</td>
+                                <td class="font-semibold">${qty} ${m.unit || ""}</td>
+                                <td class="text-xs text-gray-600 font-mono">${m.expiry || "2026-12-31"}</td>
+                                <td>${alertType}</td>
+                                <td class="text-center">
+                                    <a href="stock.html" class="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-bold transition shadow-sm">
+                                        Reorder
+                                    </a>
+                                </td>
+                            </tr>
+                        `;
+          })
+          .join("");
+      }
+
+      // ============================================================
+      // GLOBAL SEARCH
+      // ============================================================
+      document
+        .getElementById("globalSearch")
+        .addEventListener("keydown", function (e) {
+          if (e.key === "Enter" && this.value.trim()) {
+            localStorage.setItem("searchQuery", this.value.trim());
+            window.location.href = "search.html";
+          }
+        });
+
+      // ============================================================
+      // INIT
+      // ============================================================
+      renderDashboard();
+
+      console.log(
+        "%c📊 MediStock Pro - Dashboard",
+        "font-size:20px; font-weight:bold; color:#0a2647;",
+      );
+      console.log(
+        `%c💊 ${getMedicines().length} medicines loaded`,
+        "font-size:13px; color:#27ae60;",
+      );
+      console.log(
+        "%c📈 Charts rendered with real-time data.",
+        "font-size:13px; color:#64748b;",
+      );
+    </script>
+  </body>
+</html>
